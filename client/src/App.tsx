@@ -1,12 +1,10 @@
-import Background from "./components/Background"
-import Navbar from "./components/Navbar"
+import Home from "./pages/shop/Home"
 
 
 const App = () => {
   return (
     <div className="min-h-screen bg-[#F9FAFB] w-full relative">
-    <Navbar/>
-    <Background/>
+      <Home/>
     </div>
   )
 }
