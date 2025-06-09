@@ -72,7 +72,7 @@ const Carousel = () => {
             {
                 items.map(item => {
                     return (
-                        <div key={item.id} className={`h-full w-full absolute transition-all duration-500 ease-in-out ${item.id === cardNo
+                        <div key={item.id} className={`bg-center h-full w-full absolute transition-all duration-500 ease-in-out ${item.id === cardNo
                                 ? "opacity-100 z-10"
                                 : "opacity-50 "
                             }`} style={{
