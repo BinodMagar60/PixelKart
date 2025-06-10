@@ -10,8 +10,8 @@ const favourite = () => {
 }
 
   return (
-    <div className="p-4 rounded-md shadow-md hover:shadow-xl hover:-translate-0.5  bg-white transition ">
-      <div className="w-full"><img src="/carousel/motherboard.png" alt="motherboard.png" className="h-44 w-full object-cover rounded-md" /></div>
+    <div className="p-4 rounded-md shadow-md hover:shadow-xl hover:-translate-0.5  bg-white transition min-w-80">
+      <div><img src="/carousel/motherboard.png" alt="motherboard.png" className="h-44 min-w-72 object-cover rounded-md" /></div>
       <div className="space-y-1.5 mt-3 mb-1 text-gray-950">
         <div className="font-semibold leading-tight">Mother board ssaf asdfasd asdf sfsf sdf skaflslf sdfllsf</div>
         <div className="flex gap-1 items-center"><span className="text-yellow-400 fill-yellow-400 "><StarIcon size={16} fill="yellow-400" /></span> 4.8 (123)</div>

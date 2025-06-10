@@ -1,0 +1,149 @@
+import { useState } from "react";
+import '../index.css'
+import { Check, ChevronDown } from "lucide-react";
+
+const FilterPanel = () => {
+
+    type categoryType = "All" | "Laptop" | "Desktop"
+
+    type conditionType = "All" | "Brand New" | "Like New" | "Used"
+
+
+    const categoryes: categoryType[] = [
+        "All",
+        "Laptop",
+        "Desktop"
+    ]
+
+    const conditions: conditionType[] = [
+        "All",
+        "Brand New",
+        "Like New",
+        "Used"
+    ]
+
+
+    const maxPrice = 2000;
+    const [price, setPrice] = useState(maxPrice);
+    const [selectedCategory, setSelectedCategory] = useState<categoryType>("All")
+    const [categoryOpen, setCategoryOpen] = useState(false)
+    const [selectedCondition, setSelectedCondition] = useState<conditionType>("All")
+    const [conditionOpen, setConditionOpen] = useState(false)
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(e.target.value, 10);
+        if (!isNaN(value) && value <= maxPrice && value >= 0) {
+            setPrice(value);
+        }
+    };
+
+    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPrice(parseInt(e.target.value, 10));
+    };
+
+    return (
+        <div className="hidden lg:block h-full relative w-68">
+            <div className="bg-white shadow px-2 py-3 rounded-md space-y-2 sticky top-20">
+                <div className="font-semibold">Filters</div>
+                <div>Category</div>
+                <div>
+                    <div className="relative w-full text-sm">
+                        <button
+                            className="border border-gray-300 p-2 rounded-md w-full flex justify-between items-center bg-white"
+                            onClick={() => setCategoryOpen(!categoryOpen)}
+                        >
+                            <span>{selectedCategory}</span>
+                            <ChevronDown className="h-4 w-4" />
+                        </button>
+
+                        {categoryOpen && (
+                            <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
+                                {categoryes.map((option) => (
+                                    <li
+                                        key={option}
+                                        onClick={() => {
+                                            setSelectedCategory(option);
+                                            setCategoryOpen(false);
+                                        }}
+                                        className="p-0.5"
+                                    >
+                                        <div className="flex gap-2 p-2 hover:bg-gray-200 rounded-sm cursor-pointer select-none">
+                                            <span>{selectedCategory === option ? <Check size={16} /> : <Check size={16} visibility={"hidden"} />}</span>
+                                            <span>{option}</span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                </div>
+                <div>Condition</div>
+                <div>
+                     <div className="relative w-full text-sm">
+                    <button
+                        className="border border-gray-300 p-2 rounded-md w-full flex justify-between items-center bg-white"
+                        onClick={() => setConditionOpen(!conditionOpen)}
+                    >
+                        <span>{selectedCondition}</span>
+                        <ChevronDown className="h-4 w-4" />
+                    </button>
+
+                    {conditionOpen && (
+                        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
+                            {conditions.map((option) => (
+                                <li
+                                    key={option}
+                                    onClick={() => {
+                                        setSelectedCondition(option);
+                                        setConditionOpen(false);
+                                    }}
+                                    className="p-0.5"
+                                >
+                                    <div className="flex gap-2 p-2 hover:bg-gray-200 rounded-sm cursor-pointer select-none">
+                                        <span>{selectedCondition === option? <Check size={16} /> : <Check size={16} visibility={"hidden"}/>}</span>
+                                        <span>{option}</span>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+                </div>
+                <div>Price Range</div>
+                <div className="space-y-1">
+                    <input
+                        type="number"
+                        value={price}
+                        onChange={handleInputChange}
+                        className="border border-gray-300 text-sm p-2 w-full rounded-sm"
+                        placeholder={`Max price up to ${maxPrice}`}
+                        min={0}
+                        max={maxPrice}
+                    />
+                    <input
+                        type="range"
+                        min={0}
+                        max={maxPrice}
+                        value={price}
+                        onChange={handleSliderChange}
+                        className="w-full custom-slider"
+                        style={{
+                            background: `linear-gradient(to right, black 0%, black ${(
+                                (price / maxPrice) *
+                                100
+                            ).toFixed(1)}%, white ${((price / maxPrice) * 100).toFixed(1)}%, white 100%)`,
+                        }}
+                    />
+                </div>
+
+                <div>
+                    <button className="w-full border p-2 rounded-md text-white bg-black font-semibold cursor-pointer hover:bg-gray-900 transition-all hover:shadow mt-4">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default FilterPanel;

@@ -41,7 +41,7 @@ const Login = () => {
               <div className="select-none text-blue-600 hover:text-blue-700 cursor-pointer">Forgot your password?</div>
               <div className="select-none border-t-1 border-gray-300 my-2"></div>
               <div>Or Sign with</div>
-              <div className="select-none"><button className="w-full p-2 relative border-1 border-gray-300 text-center rounded-md cursor-pointer hover:shadow-md transition-all text-black"><span className="absolute left-5 top-[50%] -translate-[50%]"><img src="/google.png" alt="google.png" className="w-4"/></span><span>Login with Google</span></button></div>
+              <div className="select-none"><button className="w-full p-2 relative border-1 border-gray-300 text-center rounded-md cursor-pointer hover:shadow-md transition-all text-black"><span className="absolute left-5 top-[50%] -translate-[50%]"><img src="/google.png" alt="google.png" className="w-4" /></span><span>Login with Google</span></button></div>
               <div className="select-none">Don't have an account? <span className="select-none text-blue-600 hover:text-blue-700 cursor-pointer">Sign up</span></div>
             </div>
           </div>
