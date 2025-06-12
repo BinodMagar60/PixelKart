@@ -103,7 +103,7 @@ interface userReviewersTypes {
 const userReviewers: userReviewersTypes[] = [
     {
         id: 1,
-        rating: 3,
+        rating: 1,
         name: "Binod Magar",
         description: "Excellent gaming laptop! The RTX 4070 handles all my games at high settings. Fast delivery and great packaging."
     },
@@ -123,7 +123,8 @@ const ProductDetial = () => {
     const [selectedImg, setSelectedImg] = useState(1)
     const [favourite, setfavourite] = useState(true)
     const [productDetails, setProductDetails] = useState<productdetailTypes>("Description")
-
+    const [productRating, setProductRating] = useState<number>(0)
+    const [productStarRating, setProductStarRating] = useState<number>(0)
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -131,6 +132,17 @@ const ProductDetial = () => {
         }, 7000)
         return () => clearInterval(interval)
     }, [])
+
+    useEffect(()=> {
+        var totalRate = 0
+        userReviewers.map(index => {
+            totalRate = totalRate + index.rating
+        })
+        const newRate = totalRate / (userReviewers.length)
+        const newStarRating = customRound(newRate)
+        setProductRating(newRate)
+        setProductStarRating(newStarRating)
+    },[])
 
     function customRound(num: number): number {
         if (num <= 0) return 0;
@@ -140,8 +152,6 @@ const ProductDetial = () => {
     }
 
 
-    const productRating = 3.2
-    const productStarRating = customRound(productRating)
 
     const onDescriptionHandleChange = (value: productdetailTypes) => {
         setProductDetails(value)
@@ -261,7 +271,7 @@ const ProductDetial = () => {
                                                             }
                                                         </div>
                                                         <div className="font-semibold text-black">{item.name}</div>
-                                                        <div className="border  px-3 border-gray-300 rounded-full">Verified Purchase</div>
+                                                        <div className="border  px-2 border-gray-300 rounded-full text-xs py-0.5">Verified Purchase</div>
                                                     </div>
                                                     <div>
                                                         {item.description}
