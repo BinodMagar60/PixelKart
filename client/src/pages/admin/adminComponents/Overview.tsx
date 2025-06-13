@@ -239,7 +239,7 @@ const Overview = () => {
                                 (
 
                                     sortedStockAlert.map(item => (
-                                        <div className={`flex items-center h-full w-full p-3 rounded-md ${item.number < 4 ? "bg-red-100" : "bg-yellow-100"}`}>
+                                        <div className={`flex items-center h-full w-full p-3 rounded-md ${item.number < 4 ? "bg-red-100" : "bg-yellow-100"}`} key={item.id}>
                                             <div className={`${item.number < 4 ? "text-red-600" : "text-yellow-600"}`}>
                                                 <AlertTriangle size={30} />
                                             </div>
