@@ -11,6 +11,7 @@ const App = () => {
       {/* <ProductPage/> */}
       {/* <Home/> */}
       {/* <ProductDetial/> */}
+      {/* <Register/> */}
       <Main/>
     </div>
   )

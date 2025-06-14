@@ -136,7 +136,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
     }, [])
 
     return (
-        <div className="bg-white w-full h-fit sm:min-h-screen flex flex-col">
+        <div className="bg-white w-full h-fit sm:min-h-screen flex flex-col sticky top-0">
             <div className={`flex items-center h-15 border-b border-gray-300 pl-4 gap-4`}>
                 <button className="cursor-pointer" onClick={() => setMenuButton(!menuButton)}><Menu /></button>
                 <button className={`transition-all hidden sm:block ease-in-out duration-500 overflow-hidden ${menuButton ? "opacity-100 max-w-full" : "opacity-0 max-w-0 h-0 scale-0"

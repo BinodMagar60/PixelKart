@@ -1,4 +1,4 @@
-import { Eye, Info, Search, Trash2} from "lucide-react"
+import { Eye, Info, Search, Trash2, UserPlus } from "lucide-react"
 import { useState } from "react"
 
 
@@ -23,9 +23,14 @@ interface UserDetailsCardProps {
     setUserDetailsOpen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const Users = () => {
+interface AddWorkerCardProps {
+    setAddCardOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const Workers = () => {
 
     const [isUserDetailsOpen, setUserDetailsOpen] = useState(false)
+    const [isAddCardOpen, setAddCardOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [noOfItems, setNoOfItems] = useState(10)
     const [userDetail, setUserDetail] = useState<userDetailType>({
@@ -395,21 +400,23 @@ const Users = () => {
         setUsersData(newData)
     }
 
-    
+
 
     return (
         <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm">
             <div className="flex justify-between">
                 <div>
-                    <div className="text-black font-semibold text-xl">User Management</div>
-                    <div className="text-gray-600 text-sm">Manage user accounts</div>
+                    <div className="text-black font-semibold text-xl">Worker Management</div>
+                    <div className="text-gray-600 text-sm">Manage Worker accounts</div>
                 </div>
-                <div className="">
+                <div className="flex items-center gap-2">
                     <form className="flex" onSubmit={(e) => (e.preventDefault())}>
                         <input type="text" placeholder="Search here..." className="border border-gray-300 h-fit px-3 py-1.5 w-70 rounded-tl-md rounded-bl-md focus:bg-gray-100" value={searchQuery} onChange={(e) => (setSearchQuery(e.target.value))} />
                         <button className="border-1 h-fit p-1.5 px-2 bg-black text-white rounded-br-md rounded-tr-md border-black hover:bg-gray-900 cursor-pointer"><Search size={24} /></button>
                     </form>
-                    
+                    <div>
+                        <button className="bg-black border text-white flex px-4 gap-2 py-1.5 rounded-md items-center hover:bg-gray-900 cursor-pointer" onClick={()=>setAddCardOpen(true)}><UserPlus size={26} /><span className="text-lg">Add User</span></button>
+                    </div>
                 </div>
             </div>
             <div className="mt-10">
@@ -419,8 +426,6 @@ const Users = () => {
                             <td className="py-3 pl-3">Name</td>
                             <td className="py-3">Email</td>
                             <td className="text-center py-3">Join Data</td>
-                            <td className="text-center py-3">Orders</td>
-                            <td className="text-center py-3">Totall Spent</td>
                             <td className="text-center py-3 pr-3">Actions</td>
                         </tr>
                     </thead>
@@ -431,8 +436,6 @@ const Users = () => {
                                     <td className="py-3 pl-3 capitalize ">{item.firstName + " " + item.lastName}</td>
                                     <td className="py-3">{item.email}</td>
                                     <td className="text-center py-3">{item.joinedDate}</td>
-                                    <td className="text-center py-3">{item.orders}</td>
-                                    <td className="text-center py-3">{item.totalSpent}</td>
                                     <td className="flex justify-center gap-3 py-3 pr-3">
                                         <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white" onClick={() => {
                                             setUserDetail(item)
@@ -446,12 +449,16 @@ const Users = () => {
                     </tbody>
                 </table>
                 <div className="w-full flex justify-center">
-                    <button className={`border border-gray-300 px-3 py-2 rounded-md cursor-pointer text-white bg-black hover:border-black hover:text-black hover:bg-white transition-all duration-100 ease-in-out ${noOfItems > usersData.length? "hidden":"block"}`} onClick={()=>(setNoOfItems(prev => prev + 10))}>Load More</button>
+                    <button className={`border border-gray-300 px-3 py-2 rounded-md cursor-pointer text-white bg-black hover:border-black hover:text-black hover:bg-white transition-all duration-100 ease-in-out ${noOfItems > usersData.length ? "hidden" : "block"}`} onClick={() => (setNoOfItems(prev => prev + 10))}>Load More</button>
                 </div>
             </div>
 
             {
                 isUserDetailsOpen && <UserDetailsCard userDetail={userDetail} setUserDetailsOpen={setUserDetailsOpen} />
+            }
+
+            {
+                isAddCardOpen && <AddWorkerCard setAddCardOpen={setAddCardOpen}/>
             }
 
         </div>
@@ -466,7 +473,7 @@ const Users = () => {
 const UserDetailsCard = ({ userDetail, setUserDetailsOpen }: UserDetailsCardProps) => {
     return (
         <div className="absolute top-0 left-0 z-60 w-full h-full min-h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
-            <div className="bg-white rounded-md max-w-70/100 w-full h-fit mt-10 lg:mt-25 p-6">
+            <div className="bg-white rounded-md max-w-70/100 w-full h-fit mt-25 lg:mt-25 p-6">
                 <div className="flex justify-between mb-6">
                     <div className="text-2xl font-semibold capitalize">User Details: {userDetail.firstName + " " + userDetail.lastName}</div>
                     <div><button className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 cursor-pointer" onClick={() => setUserDetailsOpen(false)}>Close</button></div>
@@ -493,27 +500,10 @@ const UserDetailsCard = ({ userDetail, setUserDetailsOpen }: UserDetailsCardProp
                         </div>
                     </div>
                     <div className="space-y-3">
-                            <div>Reset Password</div>
-                            <div className="flex gap-3">
-                                <button className="px-3 py-2 text-white bg-black cursor-pointer rounded-md hover:bg-gray-900">Reset Password</button>
-                                <span className="text-sm text-gray-600 flex items-end gap-1"><Info size={20} /> <span className="font-semibold">Reseted password will be: 12345678</span></span>
-                            </div>
-                        </div>
-                </div>
-                <div className="space-y-4 mt-8">
-                    <div className="text-xl font-semibold">User Statistics</div>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="flex shadow-sm rounded-md flex-col items-center py-6 leading-7">
-                            <div className="font-semibold text-xl">{userDetail.orders}</div>
-                            <div className="text-sm text-gray-600">Total Orders</div>
-                        </div>
-                        <div className="flex shadow-sm rounded-md flex-col items-center py-6 leading-7">
-                            <div className="font-semibold text-xl">{userDetail.totalSpent}</div>
-                            <div className="text-sm text-gray-600">Total Spent</div>
-                        </div>
-                        <div className="flex shadow-sm rounded-md flex-col items-center py-6 leading-7">
-                            <div className="font-semibold text-xl">{userDetail.listedItems}</div>
-                            <div className="text-sm text-gray-600">Items Listed</div>
+                        <div>Reset Password</div>
+                        <div className="flex gap-3">
+                            <button className="px-3 py-2 text-white bg-black cursor-pointer rounded-md hover:bg-gray-900">Reset Password</button>
+                            <span className="text-sm text-gray-600 flex items-end gap-1"><Info size={20} /> <span className="font-semibold">Reseted password will be: 12345678</span></span>
                         </div>
                     </div>
                 </div>
@@ -522,4 +512,54 @@ const UserDetailsCard = ({ userDetail, setUserDetailsOpen }: UserDetailsCardProp
     )
 }
 
-export default Users
+
+const AddWorkerCard = ({setAddCardOpen}: AddWorkerCardProps) => {
+    return (
+        <div>
+            <div className="absolute top-0 left-0 z-60 w-full h-full min-h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
+                <div className="bg-white rounded-md max-w-50/100 w-full h-fit mt-25 lg:mt-25 p-6">
+                    <div className="flex justify-between mb-6">
+                    <div className="text-2xl font-semibold capitalize">Add Worker</div>
+                    <div><button className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 cursor-pointer" onClick={()=>setAddCardOpen(false)}>Close</button></div>
+                </div>
+                    <div className="space-y-4">
+                        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-7">
+                            <div className="space-y-3">
+                                <div>First Name</div>
+                                <div><input type="text" placeholder="John" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                            </div>
+                            <div className="space-y-3">
+                                <div>Last Name</div>
+                                <div><input type="text" placeholder="Doe" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                            </div>
+                        </div>
+                        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-7">
+                            <div className="space-y-3">
+                                <div>Address</div>
+                                <div><input type="text" placeholder="Chitwan, Nepal" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                            </div>
+                            <div className="space-y-3">
+                                <div>Contact No.</div>
+                                <div><input type="number" placeholder="9800000000" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            <div>Email</div>
+                            <div><input type="email" placeholder="john@gmail.com" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                        </div>
+                        <div className="flex gap-2 text-gray-600">
+                           <span><Info size={20}/></span>
+                           <span className="text-sm">Default password will be: <span className="font-bold">12345678</span></span>
+                        </div>
+                        <div className="w-full flex justify-center mt-10">
+                            <button className="w-full px-4 py-2 border bg-black text-white rounded-md cursor-pointer hover:bg-gray-800">Submit</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default Workers
