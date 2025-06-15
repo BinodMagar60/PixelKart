@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react"
 import Navbar from "../../components/Navbar"
 import { Heart, RotateCcw, Shield, ShoppingCart, Star, Truck } from "lucide-react"
+// import DOMPurify from 'dompurify';
+
 
 interface productTypes {
     id: number,
@@ -133,7 +135,7 @@ const ProductDetial = () => {
         return () => clearInterval(interval)
     }, [])
 
-    useEffect(()=> {
+    useEffect(() => {
         var totalRate = 0
         userReviewers.map(index => {
             totalRate = totalRate + index.rating
@@ -142,7 +144,7 @@ const ProductDetial = () => {
         const newStarRating = customRound(newRate)
         setProductRating(newRate)
         setProductStarRating(newStarRating)
-    },[])
+    }, [])
 
     function customRound(num: number): number {
         if (num <= 0) return 0;
@@ -240,6 +242,16 @@ const ProductDetial = () => {
                         productDetails === "Description" && (
                             <div className="mt-4 text-gray-600 py-4">
                                 this is the description
+                                {/* <div
+                                    className="prose prose-sm max-w-none
+                                                                    [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:my-2
+                                                                    [&_li]:my-1
+                                                                    [&_strong]:font-bold
+                                                                    [&_em]:italic
+                                                                    [&_u]:underline
+                                                                    [&_p]:my-2"
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descriptionValue) }}
+                                /> */}
                             </div>
                         )
                     }

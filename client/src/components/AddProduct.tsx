@@ -1,6 +1,7 @@
 import { Check, ChevronDown, X } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
-
+import Tiptap from "./Tiptap"
+// import DOMPurify from 'dompurify';
 
 
 
@@ -76,8 +77,18 @@ const AddProduct = ({ setAddCardOpen }: propsType) => {
                 </div>
                 <div>
                     <div className="font-semibold mb-2">Description*</div>
+                    {/* <div
+                        className="prose prose-sm max-w-none
+                                    [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:my-2
+                                    [&_li]:my-1
+                                    [&_strong]:font-bold
+                                    [&_em]:italic
+                                    [&_u]:underline
+                                    [&_p]:my-2"
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descriptionValue) }}
+                    /> */}
                     <div>
-                       
+                        <Tiptap descriptionValue={descriptionValue} setDescriptionValue={setDescriptionValue} />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

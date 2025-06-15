@@ -183,7 +183,7 @@ const Inventory = () => {
                                                 <td className="py-3 capitalize">{item.category}</td>
                                                 <td className="text-center py-3">{item.price}</td>
                                                 <td className="text-sm"><div className="flex justify-center"><input type="number" className="border border-gray-300 rounded-md px-3 py-1 max-w-20" value={item.stock} onChange={(e)=> handleStockChange(item.id, Number(e.target.value))}/></div></td>
-                                                <td className="text-sm"><div className="flex justify-center"><div className="rounded-full px-3 py-0.5 bg-black text-white w-fit">{item.status ? "Active" : "Offline"}</div></div></td>
+                                                <td className="text-sm"><div className="flex justify-center"><div className="rounded-full px-3 py-0.5 bg-black text-white w-fit">{item.status ? "Active" : "Offline"    }</div></div></td>
                                                 <td className="text-center">{item.sales}</td>
                                                 <td>
                                                     <div className="flex justify-center">

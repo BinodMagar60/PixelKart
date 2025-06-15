@@ -7,6 +7,8 @@ import Profile from "./adminComponents/Profile"
 import Users from "./adminComponents/Users"
 import Workers from "./adminComponents/Workers"
 import Inventory from "./adminComponents/Inventory"
+import Orders from "./adminComponents/Orders"
+import Categories from "./adminComponents/Categories"
 
 
 const Main = () => {
@@ -22,7 +24,9 @@ const Main = () => {
             {/* <Profile/> */}
             {/* <Users/> */}
             {/* <Workers/> */}
-            <Inventory/>
+            {/* <Inventory/> */}
+            {/* <Orders/> */}
+            <Categories/>
             </div>
         </div>
     </div>

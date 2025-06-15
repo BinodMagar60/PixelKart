@@ -71,3 +71,21 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 3rem;
+  color: black;
+}
+
+
+.ProseMirror p.is-empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af; 
+  float: left;
+  height: 0;
+  pointer-events: none;
+  font-style: italic;
+}
