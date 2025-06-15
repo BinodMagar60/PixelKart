@@ -9,6 +9,8 @@ import Workers from "./adminComponents/Workers"
 import Inventory from "./adminComponents/Inventory"
 import Orders from "./adminComponents/Orders"
 import Categories from "./adminComponents/Categories"
+import Analytics from "./adminComponents/Analytics"
+import Setting from "../../components/Setting"
 
 
 const Main = () => {
@@ -26,7 +28,9 @@ const Main = () => {
             {/* <Workers/> */}
             {/* <Inventory/> */}
             {/* <Orders/> */}
-            <Categories/>
+            {/* <Categories/> */}
+            {/* <Analytics/> */}
+            <Setting/>
             </div>
         </div>
     </div>
