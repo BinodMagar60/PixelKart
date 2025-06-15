@@ -27,7 +27,7 @@ const Setting = () => {
   })
 
   const [passwordShow, setPasswordShow] = useState<passowordShowType>({
-    currentPassword: false,
+    currentPassword: true,
     newPassword: false,
     confirmPassword: false,
   })
@@ -170,7 +170,7 @@ const Setting = () => {
         </div>
       </div>
       <div className="my-4 py-4 border-y border-gray-300">
-        <div className="font-semibold">Password Requirements:</div>
+        <div className="font-semibold mb-2">Password Requirements:</div>
         <ul className="list-disc text-gray-600 pl-8">
           <li>At least 8 characters long</li>
           <li>Include at least one uppercase letter</li>
