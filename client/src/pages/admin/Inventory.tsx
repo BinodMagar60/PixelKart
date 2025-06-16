@@ -22,7 +22,7 @@ interface warningType {
 
 const Inventory = () => {
     const [warning, setWarning] = useState<warningType>({
-        isOpen: true,
+        isOpen: false,
         message: "",
         color: ""
     })
