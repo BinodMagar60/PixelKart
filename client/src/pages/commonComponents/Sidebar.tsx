@@ -9,6 +9,11 @@ interface sideBarComponentsTypes {
         icon: ReactNode,
         link: string
     })[],
+    workerSidebar: ({
+        name: string,
+        icon: ReactNode,
+        link: string,
+    })[],
     userSidebar: ({
         name: string,
         icon: ReactNode,
@@ -28,14 +33,15 @@ interface SidebarProps {
     setTitle: React.Dispatch<React.SetStateAction<string>>,
 }
 
+type roleType = "User" | "Admin" | "Worker"
 
 
 const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
 
     const [sidebar, setSidebar] = useState<sidebarTYpes[] | null>(null)
 
-
-    const [ActiveSidebar, setActiveSidebar] = useState("Profile")
+    const [role, setRole] = useState<roleType>("User")
+    const [ActiveSidebar, setActiveSidebar] = useState("")
 
     const sideBarComponents: sideBarComponentsTypes = {
         adminSidebar: [
@@ -85,6 +91,33 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                 link: "",
             }
         ],
+        workerSidebar: [
+            {
+                name: "Profile",
+                icon: <User />,
+                link: "",
+            },
+            {
+                name: "User Management",
+                icon: <Users />,
+                link: "",
+            },
+            {
+                name: "Inventory",
+                icon: <Package />,
+                link: "",
+            },
+            {
+                name: "Orders",
+                icon: <ShoppingCart />,
+                link: "",
+            },
+            {
+                name: "Setting",
+                icon: <Settings />,
+                link: "",
+            }
+        ],
         userSidebar: [
             {
                 name: "Profile",
@@ -92,7 +125,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                 link: "",
             },
             {
-                name: "Dashbaord",
+                name: "Dashboard",
                 icon: <Home />,
                 link: "",
             },
@@ -123,17 +156,22 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
             },
         ],
     }
-    const isAdmin = true;
 
     useEffect(() => {
 
-        if (isAdmin) {
+        if (role === "Admin") {
             setSidebar(sideBarComponents.adminSidebar)
+            setActiveSidebar(sideBarComponents.adminSidebar[0].name)
+        }
+        else if(role === "Worker"){
+            setSidebar(sideBarComponents.workerSidebar)
+            setActiveSidebar(sideBarComponents.workerSidebar[0].name)
         }
         else {
             setSidebar(sideBarComponents.userSidebar)
+            setActiveSidebar(sideBarComponents.userSidebar[0].name)
         }
-    }, [])
+    }, [role])
 
     return (
         <div className="bg-white w-full h-fit sm:min-h-screen flex flex-col sticky top-0">

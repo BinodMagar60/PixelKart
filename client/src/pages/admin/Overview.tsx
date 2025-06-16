@@ -12,10 +12,10 @@ interface OrdersTypes {
 }
 
 interface AlertsTypes {
-            id: number,
-            name: string,
-            number: number,
-        }
+    id: number,
+    name: string,
+    number: number,
+}
 
 const Overview = () => {
     const [totalUsers, setTotalUsers] = useState(320);
@@ -179,7 +179,7 @@ const Overview = () => {
                         className="bg-white p-5 shadow-sm rounded-md flex justify-between items-center"
                     >
                         <div className="leading-8">
-                            <div>{item.name}</div>
+                            <div className="text-gray-600">{item.name}</div>
                             <div className="text-2xl font-semibold">{item.number}</div>
                         </div>
                         <div style={{ color: item.color }}>{item.icon}</div>
@@ -197,7 +197,7 @@ const Overview = () => {
                     }}>
                         {
                             RecentOrders.length === 0 ? (
-                                 <div className="w-full flex flex-col h-full justify-center items-center p-20">
+                                <div className="w-full flex flex-col h-full justify-center items-center p-20">
                                     <div className="text-2xl font-semibold text-gray-500">No Orders</div>
                                 </div>
                             ) :
@@ -210,7 +210,7 @@ const Overview = () => {
                                             </div>
                                             <div className="text-right">
                                                 <div>Rs. {item.price}</div>
-                                                <div className={`border border-gray-300 rounded-full text-sm px-2  ${item.status === "Delivered" ? "text-white bg-black" : ""}`}>{item.status}</div>
+                                                <div className={`border border-gray-300 rounded-full text-sm px-3  ${item.status === "Delivered" ? "text-white bg-black" : item.status === "Cancelled" ? "text-red-600" : ""}`}>{item.status}</div>
                                             </div>
                                         </div>
                                     ))

@@ -6,7 +6,7 @@ interface SidebarProps {
   title: string,
 }
 
-const DashbaordNavbar = ({ menuButton, title }: SidebarProps) => {
+const DashboardNavbar = ({ menuButton, title }: SidebarProps) => {
   const [isOpen, setOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -61,4 +61,4 @@ const DashbaordNavbar = ({ menuButton, title }: SidebarProps) => {
   );
 };
 
-export default DashbaordNavbar;
+export default DashboardNavbar;

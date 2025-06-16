@@ -1,16 +1,13 @@
 
 import { useState } from "react"
-import DashbaordNavbar from "../../components/DashbaordNavbar"
-import Sidebar from "../../components/Sidebar"
-import Overview from "./adminComponents/Overview"
-import Profile from "./adminComponents/Profile"
-import Users from "./adminComponents/Users"
-import Workers from "./adminComponents/Workers"
-import Inventory from "./adminComponents/Inventory"
-import Orders from "./adminComponents/Orders"
-import Categories from "./adminComponents/Categories"
-import Analytics from "./adminComponents/Analytics"
-import Setting from "../../components/Setting"
+import Sidebar from "./commonComponents/Sidebar"
+import Profile from "./commonComponents/Profile"
+import Workers from "./admin/Workers"
+import Dashboard from "./user/Dashboard"
+import DashboardNavbar from "./commonComponents/DashboardNavbar"
+import Inventory from "./admin/Inventory"
+import Categories from "./admin/Categories"
+
 
 
 const Main = () => {
@@ -20,17 +17,18 @@ const Main = () => {
     <div className="w-full flex min-h-screen">
         <div className={`transition-all duration-300 ease-in-out ${menuButton? "w-17/100" : "min-w-fit"}`}><Sidebar menuButton={menuButton} setMenuButton={setMenuButton} setTitle={setTitle}/></div>
         <div className="w-full">
-            <DashbaordNavbar menuButton={menuButton} title={title}/>
+            <DashboardNavbar menuButton={menuButton} title={title}/>
             <div className={`pr-4 sm:pr-30 pt-8 transition-all ease-in-out duration-500 ${menuButton? "sm:pl-5":"sm:pl-15"}`}>
             {/* <Overview/> */}
             {/* <Profile/> */}
             {/* <Users/> */}
             {/* <Workers/> */}
-            {/* <Inventory/> */}
+            <Inventory/>
             {/* <Orders/> */}
             {/* <Categories/> */}
             {/* <Analytics/> */}
-            <Setting/>
+            {/* <Setting/> */}
+            {/* <Dashboard/> */}
             </div>
         </div>
     </div>

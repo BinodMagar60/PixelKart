@@ -415,7 +415,7 @@ const Workers = () => {
                         <button className="border-1 h-fit p-1.5 px-2 bg-black text-white rounded-br-md rounded-tr-md border-black hover:bg-gray-900 cursor-pointer"><Search size={24} /></button>
                     </form>
                     <div>
-                        <button className="bg-black border text-white flex px-4 gap-2 py-1.5 rounded-md items-center hover:bg-gray-900 cursor-pointer" onClick={()=>setAddCardOpen(true)}><UserPlus size={26} /><span className="text-lg">Add User</span></button>
+                        <button className="bg-black border text-white flex px-4 gap-2 py-1.5 rounded-md items-center hover:bg-gray-900 cursor-pointer" onClick={() => setAddCardOpen(true)}><UserPlus size={26} /><span className="text-lg">Add User</span></button>
                     </div>
                 </div>
             </div>
@@ -458,7 +458,7 @@ const Workers = () => {
             }
 
             {
-                isAddCardOpen && <AddWorkerCard setAddCardOpen={setAddCardOpen}/>
+                isAddCardOpen && <AddWorkerCard setAddCardOpen={setAddCardOpen} />
             }
 
         </div>
@@ -513,15 +513,15 @@ const UserDetailsCard = ({ userDetail, setUserDetailsOpen }: UserDetailsCardProp
 }
 
 
-const AddWorkerCard = ({setAddCardOpen}: AddWorkerCardProps) => {
+const AddWorkerCard = ({ setAddCardOpen }: AddWorkerCardProps) => {
     return (
         <div>
             <div className="absolute top-0 left-0 z-60 w-full h-full min-h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
                 <div className="bg-white rounded-md max-w-50/100 w-full h-fit mt-25 lg:mt-25 p-6">
                     <div className="flex justify-between mb-6">
-                    <div className="text-2xl font-semibold capitalize">Add Worker</div>
-                    <div><button className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 cursor-pointer" onClick={()=>setAddCardOpen(false)}>Close</button></div>
-                </div>
+                        <div className="text-2xl font-semibold capitalize">Add Worker</div>
+                        <div><button className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 cursor-pointer" onClick={() => setAddCardOpen(false)}>Close</button></div>
+                    </div>
                     <div className="space-y-4">
                         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-7">
                             <div className="space-y-3">
@@ -543,13 +543,24 @@ const AddWorkerCard = ({setAddCardOpen}: AddWorkerCardProps) => {
                                 <div><input type="number" placeholder="9800000000" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
                             </div>
                         </div>
-                        <div className="space-y-3">
-                            <div>Email</div>
-                            <div><input type="email" placeholder="john@gmail.com" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-7">
+                            <div className="space-y-3">
+                                <div>Email</div>
+                                <div><input type="email" placeholder="john@gmail.com" className="border px-3 py-1 border-gray-300 rounded-md w-full" /></div>
+                            </div><div className="space-y-3">
+                                <div>Gender</div>
+                                <div>
+                                    <select name="" id="" className="border px-3 py-1 border-gray-300 rounded-md w-full">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+
                         <div className="flex gap-2 text-gray-600">
-                           <span><Info size={20}/></span>
-                           <span className="text-sm">Default password will be: <span className="font-bold">12345678</span></span>
+                            <span><Info size={20} /></span>
+                            <span className="text-sm">Default password will be: <span className="font-bold">12345678</span></span>
                         </div>
                         <div className="w-full flex justify-center mt-10">
                             <button className="w-full px-4 py-2 border bg-black text-white rounded-md cursor-pointer hover:bg-gray-800">Submit</button>

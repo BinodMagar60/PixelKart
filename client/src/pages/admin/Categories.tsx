@@ -2,7 +2,7 @@ import { Check, Edit, Plus, Trash2, X } from "lucide-react"
 import { useState } from "react"
 
 const Categories = () => {
-    const [isOpen, setOpen] = useState(true);
+    const [isOpen, setOpen] = useState(false);
     const [warning, setWarning] = useState(false)
     const [editableId, setEditablId] = useState<number | null>(null)
     const [categoriesData, setCategoriesData] = useState([

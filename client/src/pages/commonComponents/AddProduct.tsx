@@ -1,6 +1,6 @@
 import { Check, ChevronDown, X } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
-import Tiptap from "./Tiptap"
+import Tiptap from "../../components/Tiptap"
 // import DOMPurify from 'dompurify';
 
 
