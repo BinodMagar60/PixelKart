@@ -59,7 +59,7 @@ const Categories = () => {
 
 
     return (
-        <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm">
+        <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
             <div className="flex justify-between">
                 <div>
                     <div className="text-black font-semibold text-xl">Product Categories</div>

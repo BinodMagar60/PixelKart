@@ -52,7 +52,7 @@ const cardInfo: cardType[] = [
     {
         icon: <Truck size={iconSize} strokeWidth={iconStrokeWidth} color="#2563EB" />,
         title: "Free Shipping",
-        detail: "On orders over $50",
+        detail: "On orders over Rs 1499",
     },
     {
         icon: <RotateCcw size={iconSize} strokeWidth={iconStrokeWidth} color="#16A34A" />,

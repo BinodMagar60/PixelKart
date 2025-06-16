@@ -1,12 +1,9 @@
 
 import { useState } from "react"
 import Sidebar from "./commonComponents/Sidebar"
-import Profile from "./commonComponents/Profile"
-import Workers from "./admin/Workers"
-import Dashboard from "./user/Dashboard"
+
 import DashboardNavbar from "./commonComponents/DashboardNavbar"
-import Inventory from "./admin/Inventory"
-import Categories from "./admin/Categories"
+import MyPurchases from "./user/MyPurchases"
 
 
 
@@ -19,16 +16,7 @@ const Main = () => {
         <div className="w-full">
             <DashboardNavbar menuButton={menuButton} title={title}/>
             <div className={`pr-4 sm:pr-30 pt-8 transition-all ease-in-out duration-500 ${menuButton? "sm:pl-5":"sm:pl-15"}`}>
-            {/* <Overview/> */}
-            {/* <Profile/> */}
-            {/* <Users/> */}
-            {/* <Workers/> */}
-            <Inventory/>
-            {/* <Orders/> */}
-            {/* <Categories/> */}
-            {/* <Analytics/> */}
-            {/* <Setting/> */}
-            {/* <Dashboard/> */}
+              <MyPurchases/>
             </div>
         </div>
     </div>

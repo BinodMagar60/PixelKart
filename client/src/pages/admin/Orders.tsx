@@ -9,7 +9,7 @@ const Orders = () => {
             customer: "Binod kaucha",
             Product: "Nvida Laptop",
             amount: 100000,
-            status: "Processing",
+            status: "Order Placed",
             date: "12 Jan, 20025"
         },
         {
@@ -27,7 +27,7 @@ const Orders = () => {
             customer: "Binod kaucha",
             Product: "Nvida Laptop",
             amount: 100000,
-            status: "Processing",
+            status: "shipped",
             date: "12 Jan, 20025"
         },
         {
@@ -106,16 +106,10 @@ const Orders = () => {
 
 
 
-    const handleStatusChange = (id: number, newStatus: string) => {
-    setOrderDatas(prev =>
-        prev.map(order =>
-            order.id === id ? { ...order, status: newStatus } : order
-        )
-    );
-};
+
 
     return (
-        <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm">
+        <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
             <div>
                 <div className="text-black font-semibold text-xl">Orders</div>
                 <div className="text-gray-600 text-sm">Track and manage all customer orders</div>
@@ -131,40 +125,47 @@ const Orders = () => {
                                 <td className="text-center py-3">Amount</td>
                                 <td className="text-center py-3">Status</td>
                                 <td className="text-center py-3">Date</td>
+                                <td className="text-center py-3">Action</td>
                             </tr>
                         </thead>
                         <tbody>
                             {
-                                orderDatas.slice(0,noOfItems).map(item => (
+                                orderDatas.slice(0, noOfItems).map(item => (
                                     <tr className="hover:bg-gray-100 rounded-md border-t border-gray-300" key={item.id}>
                                         <td className="py-3 pl-3 max-w-18">{item.orderId}</td>
                                         <td className="py-3 capitalize max-w-22 overflow-hidden whitespace-nowrap truncate text-ellipsis">{item.customer}</td>
                                         <td className="py-3 overflow-hidden max-w-40 whitespace-nowrap truncate text-ellipsis">{item.Product}</td>
                                         <td className="text-center py-3">{item.amount}</td>
-                                        <td className="max-w-16">
-                                            <div className="w-full flex justify-center text-center">
+                                        <td className="text-center py-3">
+                                            {item.status}
+                                        </td>
+                                        <td className="py-3 text-center">{item.date}</td>
+                                        <td className="pr-2 text-center max-w-35">
+                                            <div>
                                                 {
-                                                    item.status === "Cancelled" ? <div className="text-red-600">Cancelled</div> : (
-                                                        <select className="border px-3 py-1  border-gray-300 rounded-md"
-                                                            value={item.status}
-                                                            onChange={(e) => handleStatusChange(item.id, e.target.value)}>
-                                                            <option value="Processing">Processing</option>
-                                                            <option value="Shipped">Shipped</option>
-                                                            <option value="Delivered">Delivered</option>
-                                                            <option value="Cancelled">Cancelled</option>
-                                                        </select>
+                                                    item.status === "Cancelled"? "-" : item.status === "Delivered"? "-" : (
+                                                        <div className="flex flex-col gap-1 items-center">
+                                                            <button className="px-2 py-1 border rounded-md w-fit min-w-30">
+                                                                {item.status === "Order Placed"? "Processing": item.status === "Processing"? "Shipping" : "Delivered"}
+                                                            </button>
+                                                            {
+                                                                item.status === "Order Placed" && (
+                                                                    <button className="px-2 py-1 border rounded-md w-fit min-w-30">Cancel</button>
+                                                                )
+                                                            }
+                                                        </div>
                                                     )
                                                 }
                                             </div>
                                         </td>
-                                        <td className=" py-3 pr-2 text-center">{item.date}</td>
+
                                     </tr>
                                 ))
                             }
                         </tbody>
                     </table>
                     <div className="w-full flex justify-center">
-                        <button className={`border border-gray-300 px-3 py-2 rounded-md cursor-pointer text-white bg-black hover:border-black hover:text-black hover:bg-white transition-all duration-100 ease-in-out ${noOfItems > orderDatas.length? "hidden": "block"}`} onClick={()=> (noOfItems < orderDatas.length? setNoOfItems(prev => prev+10): "")}>Load More</button>
+                        <button className={`border border-gray-300 px-3 py-2 rounded-md cursor-pointer text-white bg-black hover:border-black hover:text-black hover:bg-white transition-all duration-100 ease-in-out ${noOfItems > orderDatas.length ? "hidden" : "block"}`} onClick={() => (noOfItems < orderDatas.length ? setNoOfItems(prev => prev + 10) : "")}>Load More</button>
                     </div>
                 </div>
             </div>

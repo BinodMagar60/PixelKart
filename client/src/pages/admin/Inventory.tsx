@@ -1,5 +1,5 @@
 import { Edit, Eye, Plus, Save, Search, Trash2, X } from "lucide-react"
-import { use, useState } from "react"
+import { useState } from "react"
 import AddProduct from "../commonComponents/AddProduct"
 
 
@@ -197,7 +197,7 @@ const Inventory = () => {
     }
 
     return (
-        <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm">
+        <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
             {
                 !isAddCardOpen && (
                     <>
