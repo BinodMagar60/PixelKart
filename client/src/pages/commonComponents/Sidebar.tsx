@@ -177,7 +177,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
         <div className="bg-white w-full h-fit sm:min-h-screen flex flex-col sticky top-0">
             <div className={`flex items-center h-15 border-b border-gray-300 pl-4 gap-4`}>
                 <button className="cursor-pointer" onClick={() => setMenuButton(!menuButton)}><Menu /></button>
-                <button className={`transition-all hidden sm:block ease-in-out duration-500 overflow-hidden ${menuButton ? "opacity-100 max-w-full" : "opacity-0 max-w-0 h-0 scale-0"
+                <button className={`transition-all hidden sm:block ease-in-out duration-500 overflow-hidden ${menuButton ? "" : "w-0"
                     }`}>
                     <div className="flex h-full items-center gap-1"><img src="/logo.png" alt="PixelKart" className="h-10" /><span className="text-3xl font-bold">PixelKart</span></div>
                 </button>
@@ -191,7 +191,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                                 setTitle(item.name)
                             }}>
                             <div>{item.icon}</div>
-                            <div className={`transition-all ease-in-out duration-500 overflow-hidden ${menuButton ? "opacity-100 max-w-full h-6" : "opacity-0 max-w-0 h-0 scale-0"
+                            <div className={`transition-all ease-in-out whitespace-nowrap duration-500 overflow-hidden ${menuButton ? "" : "w-0"
                                 }`}>{item.name}</div>
                         </div>
                     ))

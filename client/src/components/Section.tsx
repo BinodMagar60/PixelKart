@@ -1,29 +1,45 @@
+import { useEffect, useState } from "react"
 import Card from "./Card"
 
-interface propsType {
-    sectionName: String,
-    sectionBackgroundColor: string
+type propsType = {
+  sectionName: string,
+  sectionBackgroundColor: string
 }
 
-const Section = ({sectionName, sectionBackgroundColor}: propsType) => {
+const cycle = [1,2,3,4,5,6,7,8,9,10,11,12]
+
+const Section = ({ sectionName, sectionBackgroundColor }: propsType) => {
+  const [itemsToShow, setItemsToShow] = useState(12)
+
+  useEffect(() => {
+    const updateItemsToShow = () => {
+      const width = window.innerWidth
+      if (width < 640) {
+        setItemsToShow(4)
+      } else if (width >= 640 && width < 1024) {
+        setItemsToShow(4)
+      } else if (width >= 1024 && width < 1280) {
+        setItemsToShow(6)
+      } else if (width >= 1280 && width < 1536) {
+        setItemsToShow(8)
+      } else {
+        setItemsToShow(10)
+      }
+    }
+
+    updateItemsToShow()
+    window.addEventListener("resize", updateItemsToShow)
+    return () => window.removeEventListener("resize", updateItemsToShow)
+  }, [])
+
   return (
-    <div className={`w-full px-30 py-12 ${sectionBackgroundColor}`}>
-        <div className="mb-8 font-bold text-2xl">{sectionName}</div>
-        <div className="flex flex-wrap -mx-4">
-            <div className="w-full sm:w-1/2 lg:w-1/4 px-4 mb-8">
-                <Card/>
-            </div>
-            <div className="w-full sm:w-1/2 lg:w-1/4 px-4 mb-8">
-                <Card/>
-            </div>
-            <div className="w-full sm:w-1/2 lg:w-1/4 px-4 mb-8">
-                <Card/>
-            </div>
-            <div className="w-full sm:w-1/2 lg:w-1/4 px-4 mb-8">
-                <Card/>
-            </div>
-            
-        </div>
+    <div className={`w-full px-10 sm:px-15 xl:px-30 lg:grid flex flex-col items-center py-12 ${sectionBackgroundColor}`}>
+      <div className="mb-8 font-bold text-2xl">{sectionName}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+        {cycle.slice(0, itemsToShow).map(item => (
+          <span key={item}><Card /></span>
+        ))}
+      </div>
     </div>
   )
 }

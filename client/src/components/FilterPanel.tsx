@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useState, type SetStateAction } from "react";
 import '../index.css'
 import { Check, ChevronDown } from "lucide-react";
 
-const FilterPanel = () => {
+
+type propsTypes = {
+    isFilterActive: boolean,
+    setIsFilterActive: React.Dispatch<SetStateAction<boolean>>
+}
+
+
+const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
 
     type categoryType = "All" | "Laptop" | "Desktop"
 
@@ -42,8 +49,8 @@ const FilterPanel = () => {
     };
 
     return (
-        <div className="hidden lg:block h-full relative w-68">
-            <div className="bg-white shadow px-2 py-3 rounded-md space-y-2 sticky top-20">
+        <div className={` h-full w-68 ${isFilterActive ? "mx-auto w-80 " : "relative hidden lg:block"}`}>
+            <div className={`bg-white shadow px-2 py-3 rounded-md space-y-2 sticky top-20 ${isFilterActive? "px-4":""}`}>
                 <div className="font-semibold">Filters</div>
                 <div>Category</div>
                 <div>
@@ -79,35 +86,35 @@ const FilterPanel = () => {
                 </div>
                 <div>Condition</div>
                 <div>
-                     <div className="relative w-full text-sm">
-                    <button
-                        className="border border-gray-300 p-2 rounded-md w-full flex justify-between items-center bg-white"
-                        onClick={() => setConditionOpen(!conditionOpen)}
-                    >
-                        <span>{selectedCondition}</span>
-                        <ChevronDown className="h-4 w-4" />
-                    </button>
+                    <div className="relative w-full text-sm">
+                        <button
+                            className="border border-gray-300 p-2 rounded-md w-full flex justify-between items-center bg-white"
+                            onClick={() => setConditionOpen(!conditionOpen)}
+                        >
+                            <span>{selectedCondition}</span>
+                            <ChevronDown className="h-4 w-4" />
+                        </button>
 
-                    {conditionOpen && (
-                        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
-                            {conditions.map((option) => (
-                                <li
-                                    key={option}
-                                    onClick={() => {
-                                        setSelectedCondition(option);
-                                        setConditionOpen(false);
-                                    }}
-                                    className="p-0.5"
-                                >
-                                    <div className="flex gap-2 p-2 hover:bg-gray-200 rounded-sm cursor-pointer select-none">
-                                        <span>{selectedCondition === option? <Check size={16} /> : <Check size={16} visibility={"hidden"}/>}</span>
-                                        <span>{option}</span>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+                        {conditionOpen && (
+                            <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
+                                {conditions.map((option) => (
+                                    <li
+                                        key={option}
+                                        onClick={() => {
+                                            setSelectedCondition(option);
+                                            setConditionOpen(false);
+                                        }}
+                                        className="p-0.5"
+                                    >
+                                        <div className="flex gap-2 p-2 hover:bg-gray-200 rounded-sm cursor-pointer select-none">
+                                            <span>{selectedCondition === option ? <Check size={16} /> : <Check size={16} visibility={"hidden"} />}</span>
+                                            <span>{option}</span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
                 <div>Price Range</div>
                 <div className="space-y-1">
@@ -137,9 +144,16 @@ const FilterPanel = () => {
                 </div>
 
                 <div>
-                    <button className="w-full border p-2 rounded-md text-white bg-black font-semibold cursor-pointer hover:bg-gray-900 transition-all hover:shadow mt-4">
+                    <button className="w-full border p-2 rounded-md border-gray-300 font-semibold cursor-pointer hover:bg-gray-100 transition-all hover:shadow mt-4">
                         Clear Filters
                     </button>
+                    {
+                        isFilterActive && (
+                            <button className="w-full border p-2 rounded-md text-white bg-black font-semibold cursor-pointer hover:bg-gray-900 transition-all hover:shadow mt-4" onClick={()=>setIsFilterActive(false)}>
+                                Close
+                            </button>
+                        )
+                    }
                 </div>
             </div>
         </div>

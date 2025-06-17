@@ -97,6 +97,20 @@ const MyPurchases = () => {
 
 
 
+    const handleCancel = (id: number) => {
+        const newData = orderData.map(item => {
+            if(id === item.id) {
+                return {...item, status: "Cancelled"}
+            }
+            return item
+        })
+        setOrderData(newData)
+        if (selectedProduct.id === id) {
+        setSelectedProduct(prev => ({ ...prev, status: "Cancelled" }));
+    }
+    }
+
+
     return (
         <>
             {
@@ -140,7 +154,7 @@ const MyPurchases = () => {
                 )
             }
             {
-                openDetail && <MyOrderList setOpenDetail={setOpenDetail} selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+                openDetail && <MyOrderList setOpenDetail={setOpenDetail} selectedProduct={selectedProduct} handleCancel={handleCancel}/>
             }
         </>
     )
@@ -149,10 +163,10 @@ const MyPurchases = () => {
 interface MyOrderListTypes {
     setOpenDetail: React.Dispatch<React.SetStateAction<boolean>>,
     selectedProduct: orderDataType,
-    setSelectedProduct: React.Dispatch<React.SetStateAction<orderDataType>>
+    handleCancel: (id: number)=> void
 }
 
-const MyOrderList = ({setOpenDetail, selectedProduct, setSelectedProduct}:MyOrderListTypes) => {
+const MyOrderList = ({setOpenDetail, selectedProduct,  handleCancel}:MyOrderListTypes) => {
     return (
         <div className="w-full">
             <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
@@ -202,7 +216,7 @@ const MyOrderList = ({setOpenDetail, selectedProduct, setSelectedProduct}:MyOrde
                         <div>
                             {
                                 selectedProduct.status === "Order Placed" && (
-                                    <button className="w-full px-3 py-2 bg-black text-white font-semibold rounded-md hover:bg-gray-800 cursor-pointer mt-6">Cancel</button>
+                                    <button className="w-full px-3 py-2 bg-black text-white font-semibold rounded-md hover:bg-gray-800 cursor-pointer mt-6" onClick={()=> handleCancel(selectedProduct.id)}>Cancel</button>
                                 ) 
                             }
                         </div>

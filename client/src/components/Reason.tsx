@@ -40,7 +40,7 @@ const Reason = () => {
 
         <div className={`w-full px-30 py-16 flex flex-col items-center bg-white`}>
             <div className="mb-8 font-semibold text-2xl">Why Choose PixelKart?</div>
-            <div className="flex space-x-8 text-center">
+            <div className="grid grid-rows-3 space-y-4 md:space-y-0 md:flex md:space-x-8 text-center ">
                 {
                     cardInfo.map((item, index) => (
                         <div key={index} className="flex flex-col space-y-4 items-center">

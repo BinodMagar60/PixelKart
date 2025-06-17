@@ -2,7 +2,12 @@ import { useState } from "react";
 import Card from "./Card"
 import { Check, ChevronDown } from "lucide-react";
 
-const Products = () => {
+
+type PropsTypes = {
+        setIsFilterActive: React.Dispatch<React.SetStateAction<boolean>>
+    }
+
+const Products = ({setIsFilterActive}:PropsTypes) => {
 
 
     const options: optionType[] = [
@@ -12,7 +17,10 @@ const Products = () => {
         "Newest",
     ];
 
+    const cycle = [1,2,3,4,5,6,7,8,9,10]
+
     type optionType = "Price: Low to High" | "Price: High to Low" | "Highest Rated" | "Newest"
+
 
     const [selected, setSelected] = useState<optionType>("Highest Rated");
     const [open, setOpen] = useState(false);
@@ -21,11 +29,15 @@ const Products = () => {
     return (
         <div className="w-full pb-8">
             <div className="flex justify-between">
-                <div>
+                <div className="hidden sm:block">
                     <div className="font-semibold text-xl">Products</div>
                     <div className="text-sm text-gray-600 font-semibold">? products found</div>
                 </div>
-                <div className="relative w-48 text-sm">
+                <div className="flex gap-2 items-center">
+                    <div className="lg:hidden">
+                        <button className="border py-1 px-2 rounded-md border-gray-300 bg-white cursor-pointer" onClick={()=>setIsFilterActive(true)}>Filter</button>
+                    </div>
+                    <div className="relative w-48 text-sm">
                     <button
                         className="border border-gray-300 p-2 rounded-md w-full flex justify-between items-center bg-white"
                         onClick={() => setOpen(!open)}
@@ -54,19 +66,14 @@ const Products = () => {
                         </ul>
                     )}
                 </div>
+                </div>
             </div>
-            <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 xl:gap-6 2xl:gap-8 2xl:grid-cols-4">
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-
+            <div className="mt-4 w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-2">
+               {
+                cycle.map(item => (
+                    <span key={item}><Card/></span>
+                ))
+               }
             </div>
         </div>
     )

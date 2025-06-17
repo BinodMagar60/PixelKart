@@ -4,6 +4,9 @@ import Sidebar from "./commonComponents/Sidebar"
 
 import DashboardNavbar from "./commonComponents/DashboardNavbar"
 import MyPurchases from "./user/MyPurchases"
+import Inventory from "./admin/Inventory"
+import MyListings from "./user/MyListings"
+import Orders from "./admin/Orders"
 
 
 
@@ -16,7 +19,10 @@ const Main = () => {
         <div className="w-full">
             <DashboardNavbar menuButton={menuButton} title={title}/>
             <div className={`pr-4 sm:pr-30 pt-8 transition-all ease-in-out duration-500 ${menuButton? "sm:pl-5":"sm:pl-15"}`}>
-              <MyPurchases/>
+              {/* <MyPurchases/> */}
+              {/* <Inventory/> */}
+              {/* <Orders/> */}
+              <MyListings/>
             </div>
         </div>
     </div>

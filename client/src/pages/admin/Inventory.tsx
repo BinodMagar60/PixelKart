@@ -254,11 +254,12 @@ const Inventory = () => {
                                                 </td>
                                                 <td className=" py-3 pr-3">
                                                     <div className="flex justify-center gap-3">
+                                                        
+                                                        <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white"><Eye size={20} /></button>
                                                         <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white" onClick={() => {
                                                             setEditOpen(true)
                                                             setSelectedProduct(item)
                                                         }}><Edit size={20} /></button>
-                                                        <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white"><Eye size={20} /></button>
                                                         <button className="p-2 cursor-pointer border border-red-500 rounded-md text-white bg-red-500 hover:bg-red-400 hover:border-red-400" ><Trash2 size={20} /></button>
                                                     </div>
 
