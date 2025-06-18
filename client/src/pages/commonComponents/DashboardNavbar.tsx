@@ -24,7 +24,7 @@ const DashboardNavbar = ({ menuButton, title }: SidebarProps) => {
   }, []);
 
   return (
-    <div className="w-full h-15 pr-5 sticky top-0 sm:pr-30 bg-white flex items-center justify-between z-50 border-b border-gray-300">
+    <div className="w-full h-15 pr-10 sm:pr-15 xl:pr-30 sticky top-0 bg-white flex items-center justify-between z-50 border-b border-gray-300">
       <div className={`font-semibold text-2xl transition-all ease-in-out duration-500 ${menuButton ? "sm:pl-5" : "sm:pl-15"}`}>{title}</div>
       <div className="relative" ref={dropdownRef}>
         <div className="flex items-center gap-3">

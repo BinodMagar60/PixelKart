@@ -1,4 +1,6 @@
 import Main from "./pages/Main"
+import Cart from "./pages/shop/Cart"
+import Checkout from "./pages/shop/Checkout"
 import Home from "./pages/shop/Home"
 import ProductDetial from "./pages/shop/ProductDetial"
 import ProductPage from "./pages/shop/ProductPage"
@@ -12,7 +14,9 @@ const App = () => {
       {/* <Home/> */}
       {/* <ProductDetial/> */}
       {/* <Register/> */}
-      <Main/>
+      {/* <Main/> */}
+      {/* <Cart/> */}
+      <Checkout/>
     </div>
   )
 }
