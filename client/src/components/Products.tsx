@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Card from "./Card"
 import { Check, ChevronDown } from "lucide-react";
+import type { ProductType } from "../types/ProductType";
+import { useProductContext } from "../context/productContext";
 
 
 type PropsTypes = {
@@ -9,6 +11,7 @@ type PropsTypes = {
 
 const Products = ({setIsFilterActive}:PropsTypes) => {
 
+    const {products} = useProductContext()
 
     const options: optionType[] = [
         "Highest Rated",
@@ -17,7 +20,7 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
         "Newest",
     ];
 
-    const cycle = [1,2,3,4,5,6,7,8,9,10]
+    
 
     type optionType = "Price: Low to High" | "Price: High to Low" | "Highest Rated" | "Newest"
 
@@ -70,8 +73,8 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
             </div>
             <div className="mt-4 w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-2">
                {
-                cycle.map(item => (
-                    <span key={item}><Card/></span>
+                products.map(item => (
+                    <span key={item.id}><Card product={item}/></span>
                 ))
                }
             </div>

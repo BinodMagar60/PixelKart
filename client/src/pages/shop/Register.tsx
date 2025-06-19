@@ -1,7 +1,32 @@
 import { ArrowLeft, Check, Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
+import { registerUser } from "../../api/LoginRegisterAPI";
+
+
 
 const Register = () => {
+  const [loading, setLoading] = useState(false)
+  const [userData, setUserData] = useState({
+    firstName: "",
+    secondName: "",
+    email: "",
+    gender: "Male",
+    password: "",
+    cPassword: "",
+  })
+
+  const [error, setError] = useState({
+    firstName: false,
+    email: false,
+    password: false,
+    cPassword: false,
+  })
+
+  const [warning, setWarning] = useState({
+    isOn: false,
+    message: "",
+  })
+
   const [passwordType, setPasswordType] = useState<"password" | "text">(
     "password"
   );
@@ -30,6 +55,96 @@ const Register = () => {
     setTos(!tos);
   };
 
+  const handleChange = (e: { target: { name: string; value: string; }; }) => {
+    const { name, value } = e.target
+    setUserData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const validate = () => {
+    const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+    if (!userData.firstName.trim()) {
+      setError(prev => ({ ...prev, firstName: true }));
+      setWarning({ isOn: true, message: "First Name is required" });
+      return false;
+    } else {
+      setError(prev => ({ ...prev, firstName: false }));
+    }
+
+    if (!userData.email.trim()) {
+      setError(prev => ({ ...prev, email: true }));
+      setWarning({ isOn: true, message: "Email is required" });
+      return false;
+    } else if (!regex.test(userData.email.trim())) {
+      setError(prev => ({ ...prev, email: true }));
+      setWarning({ isOn: true, message: "Email must end with @gmail.com" });
+      return false;
+    } else {
+      setError(prev => ({ ...prev, email: false }));
+    }
+
+    if (!userData.password) {
+      setError(prev => ({ ...prev, password: true }));
+      setWarning({ isOn: true, message: "Password is required" });
+      return false;
+    } else if (userData.password.length < 8) {
+      setError(prev => ({ ...prev, password: true }));
+      setWarning({ isOn: true, message: "Password must be at least 8 characters" });
+      return false;
+    } else {
+      setError(prev => ({ ...prev, password: false }));
+    }
+
+    if (userData.password !== userData.cPassword) {
+      setError(prev => ({ ...prev, cPassword: true }));
+      setWarning({ isOn: true, message: "Passwords do not match" });
+      return false;
+    } else {
+      setError(prev => ({ ...prev, cPassword: false }));
+    }
+
+    if (!tos) {
+      setWarning({ isOn: true, message: "Please agree to the Terms of Service" });
+      return false;
+    }
+
+    setWarning({ isOn: false, message: "" });
+    return true;
+  };
+
+
+
+  const handleSubmit = async () => {
+
+    if (validate()) {
+      setLoading(true)
+      try {
+        const response = await registerUser("auth/users/register", {
+          firstName: userData.firstName, email: userData.email, password: userData.password, gender: userData.gender, secondName: userData.secondName
+        })
+        console.log(response)
+      }
+      catch (error) {
+        console.log(error)
+      }
+      finally {
+        setUserData({
+          firstName: "",
+          secondName: "",
+          email: "",
+          gender: "Male",
+          password: "",
+          cPassword: "",
+        })
+        setLoading(false)
+      }
+    }
+  }
+
+
   return (
     <div className="w-full min-h-screen flex justify-center pt-16 pb-10">
       <div className="min-w-64 max-w-110 w-full text-gray-600">
@@ -47,16 +162,26 @@ const Register = () => {
             <div className="text-sm">Create your account to get started</div>
           </div>
           <div className="space-y-2">
+            {
+              warning.isOn && (
+                <div className={`w-full border border-red-600 bg-red-100 text-red-500 rounded-sm py-1 px-4`} >
+                  {warning.message}
+                </div>
+              )
+            }
             <div className="flex space-x-2">
               <div className="space-y-2">
                 <div className="text-black">
-                  <label htmlFor="firstname">First Name</label>
+                  <label htmlFor="firstname">First Name*</label>
                 </div>
                 <div>
                   <input
                     type="text"
                     id="firstname"
-                    className="border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black "
+                    name="firstName"
+                    value={userData.firstName}
+                    onChange={handleChange}
+                    className={`border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black ${error.firstName ? "border-red-600" : ""}`}
                     placeholder="John"
                   />
                 </div>
@@ -69,6 +194,9 @@ const Register = () => {
                   <input
                     type="text"
                     id="lastname"
+                    name="secondName"
+                    value={userData.secondName}
+                    onChange={handleChange}
                     className="border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black "
                     placeholder="Doe"
                   />
@@ -76,13 +204,16 @@ const Register = () => {
               </div>
             </div>
             <div className="text-black">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Email*</label>
             </div>
             <div>
               <input
                 type="email"
                 id="email"
-                className="border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black "
+                name="email"
+                value={userData.email}
+                onChange={handleChange}
+                className={`border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black ${error.email ? "border-red-600" : ""}`}
                 placeholder="Enter your email"
               />
             </div>
@@ -90,19 +221,22 @@ const Register = () => {
               <label htmlFor="gender">Gender</label>
             </div>
             <div>
-              <select name="" id="gender" className="w-full border border-gray-300 rounded-md py-1 pl-2 text-black">
-                <option value="Male" selected>Male</option>
+              <select id="gender" name="gender" value={userData.gender} className="w-full border border-gray-300 rounded-md py-1 pl-2 text-black" onChange={handleChange}>
+                <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
             </div>
             <div className="text-black">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Password*</label>
             </div>
             <div className="relative flex">
               <input
                 type={passwordType}
                 id="password"
-                className="border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black pr-8"
+                name="password"
+                value={userData.password}
+                onChange={handleChange}
+                className={`border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black pr-8 ${error.password ? "border-red-600" : ""}`}
                 placeholder="Create a password"
               />
               <div
@@ -117,13 +251,16 @@ const Register = () => {
               </div>
             </div>
             <div className="text-black">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="confirmPassword">Confirm Password*</label>
             </div>
             <div className="relative flex">
               <input
                 type={confirmPasswordType}
                 id="confirmPassword"
-                className="border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black pr-8"
+                name="cPassword"
+                value={userData.cPassword}
+                onChange={handleChange}
+                className={`border-1 w-full py-1 rounded-md border-gray-300 pl-2 text-black pr-8 ${error.cPassword ? "border-red-600" : ""}`}
                 placeholder="Confirm your password"
               />
               <div
@@ -169,22 +306,13 @@ const Register = () => {
               </div>
             </div>
             <div className="my-4">
-              <button className="select-none w-full bg-black text-white p-2 rounded-md cursor-pointer transition-all hover:bg-gray-900">
+              <button className="select-none w-full bg-black text-white p-2 rounded-md cursor-pointer transition-all hover:bg-gray-900" disabled={loading} onClick={handleSubmit}>
                 Sign Up
               </button>
             </div>
             <div className="text-center text-sm space-y-2">
               <div className="select-none border-t-1 border-gray-300 my-2"></div>
-              <div>Or Sign with</div>
-              <div className="select-none">
-                <button className="w-full p-2 relative border-1 border-gray-300 text-center rounded-md cursor-pointer hover:shadow-md transition-all text-black">
-                  <span className="absolute left-5 top-[50%] -translate-[50%]">
-                    <img src="/google.png" alt="google.png" className="w-4" />
-                  </span>
-                  <span>Signup with Google</span>
-                </button>
-              </div>
-              <div className="select-none">
+              <div className="select-none mt-4">
                 Already have an account?{" "}
                 <span className="select-none text-blue-600 hover:text-blue-700 cursor-pointer">
                   Sign in

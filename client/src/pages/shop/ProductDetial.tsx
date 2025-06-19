@@ -1,6 +1,8 @@
-import { useEffect, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Navbar from "../../components/Navbar"
 import { Heart, RotateCcw, Shield, ShoppingCart, Star, Truck } from "lucide-react"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { useProductContext } from "../../context/productContext"
 // import DOMPurify from 'dompurify';
 
 
@@ -122,6 +124,18 @@ const userReviewers: userReviewersTypes[] = [
 
 
 const ProductDetial = () => {
+
+
+    const { id } = useParams()
+    const productId = Number(id)
+    const { products } = useProductContext()
+
+    const product = useMemo(() => {
+        return products.find(item => item.id === productId)
+    }, [products, productId])
+
+
+    if (!product) return null;
     const [selectedImg, setSelectedImg] = useState(1)
     const [favourite, setfavourite] = useState(true)
     const [productDetails, setProductDetails] = useState<productdetailTypes>("Description")
@@ -162,10 +176,10 @@ const ProductDetial = () => {
     return (
         <div className="w-full">
             <Navbar />
-            <div className="w-full px-30 py-10">
+            <div className="w-full px-10 sm:px-15 xl:px-30 py-10">
                 {/* image and buy section */}
-                <div className="w-full flex">
-                    <div className="w-1/2 space-y-5 mr-10">
+                <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div className="w-full space-y-5 mr-10">
                         <div className="w-full relative h-140">
                             {
                                 productImages.map(item => (
@@ -178,33 +192,35 @@ const ProductDetial = () => {
                         <div className="w-1/2 flex gap-2">
                             {
                                 productImages.map(item => (
-                                    <div key={item.id} className="h-25 w-25"><img src={item.url} alt={item.name} className={`w-full h-full object-cover rounded-md cursor-pointer ${selectedImg === item.id ? "ring-3 ring-blue-500" : ""}`} onClick={() => { setSelectedImg(item.id) }} /></div>
+                                    <div key={item.id} className="h-25 min-w-25"><img src={item.url} alt={item.name} className={`w-full h-full object-cover rounded-md cursor-pointer ${selectedImg === item.id ? "ring-3 ring-blue-500" : ""}`} onClick={() => { setSelectedImg(item.id) }} /></div>
                                 ))
                             }
                         </div>
                     </div>
-                    <div className="w-1/2 space-y-3">
-                        <div className="bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl">Brand New</div>
-                        <div className="text-4xl font-bold">Gaming Laptop RTX 4070</div>
+                    <div className="w-full space-y-3">
+                        <div className="bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl">{product.condition}</div>
+                        <div className="text-4xl font-bold">{product.productName}</div>
                         <div className="flex gap-4">
                             <span className="flex items-center gap-2"><span><Star color="orange" fill="orange" size={20} /></span> <span className="font-semibold">4.8</span> <span className="text-gray-600">(124 reviews)</span></span>
                             <span className="text-gray-600">by Binod Magar</span>
                         </div>
                         <div className="flex gap-2">
-                            <span>$1299.99</span>
-                            <span className="line-through text-sm text-gray-600">$1499.99</span>
-                            <span className="ml-2 text-white bg-red-500 px-3 py-0.5 rounded-full">Save $200.00</span>
+                            <span>Rs.{product.price}</span>
+                            {
+                                product.price !== product.originalPrice && (
+                                    <>
+                                        <span className="line-through text-sm text-gray-600">Rs.{product.originalPrice}</span>
+                                        <span className="ml-2 text-white bg-red-500 px-3 py-0.5 rounded-full">Save Rs.{product.originalPrice - product.price}</span>
+                                    </>
+                                )
+                            }
                         </div>
                         <div className="text-green-600 font-semibold text-md">Free shipping</div>
                         <div className="text-md mt-6">
                             <span className="">Quantity: </span>
                             <span>
                                 <select name="" id="" className="border bg-white px-2 py-0.5 border-gray-300 rounded-sm mx-2">
-                                    <option value={1}>1</option>
-                                    <option value={2}>2</option>
-                                    <option value={3}>3</option>
-                                    <option value={4}>4</option>
-                                    <option value={5}>5</option>
+                                    
                                 </select>
                                 <span className="text-gray-600 text-sm">(5 available)</span>
                             </span>

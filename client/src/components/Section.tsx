@@ -36,9 +36,9 @@ const Section = ({ sectionName, sectionBackgroundColor }: propsType) => {
     <div className={`w-full px-10 sm:px-15 xl:px-30 lg:grid flex flex-col items-center py-12 ${sectionBackgroundColor}`}>
       <div className="mb-8 font-bold text-2xl">{sectionName}</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-        {cycle.slice(0, itemsToShow).map(item => (
+        {/* {cycle.slice(0, itemsToShow).map(item => (
           <span key={item}><Card /></span>
-        ))}
+        ))} */}
       </div>
     </div>
   )

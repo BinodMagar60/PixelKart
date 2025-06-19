@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar"
 import Products from "../../components/Products"
 
 const ProductPage = () => {
+  
 
   const [isFilterActive, setIsFilterActive] = useState<boolean>(false)
 
