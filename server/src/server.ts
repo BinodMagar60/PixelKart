@@ -2,11 +2,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser'
 import LoginSingnup from './routes/LoginSignup'
 
 dotenv.config();
-
 const app = express();
+app.use(cookieParser())
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "";
 

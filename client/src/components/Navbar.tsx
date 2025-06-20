@@ -1,13 +1,17 @@
 import { LayoutDashboard, LogOut, Search, Settings, ShoppingCart, User } from "lucide-react"
 
 import { useEffect, useRef, useState } from "react"
-
+import { useUserContext } from "../context/UserContext"
+import { logoutUser } from "../api/LoginRegisterAPI"
+import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom"
 
 
 const Navbar = () => {
-    const [loggedIn, setLogginedIn] = useState(false)
+    const {userInfo, setUserInfo} = useUserContext()
     const [isOpen, setOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const navigate = useNavigate();
 
     const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -23,10 +27,24 @@ const Navbar = () => {
     }
 
 
-    const handleLogout = () => {
-        setLogginedIn(prev => !prev)
+    const handleLogout = async() => {
+        const response = await logoutUser('auth/users/logout')
+        if(response.status === 400 || response.status === 500){
+            toast.error(response.data.message,{
+                autoClose: 1000,
+                theme: "light"
+            })
+            return
+        }
+        toast.success(response.message, {
+            autoClose: 1000,
+            theme: "light"
+        })
+        setUserInfo(null)
     }
 
+    
+    // console.log(userInfo)
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -75,19 +93,24 @@ const Navbar = () => {
                         )
                     }
                     {
-                        !loggedIn && (
+                        !userInfo && (
                             <>
                                 <div>
-                                    <button className="rounded-sm px-3 py-1.5 cursor-pointer flex gap-2 items-center hover:bg-gray-100" onClick={handleLogout}><User size={16} strokeWidth={2} /> Sign In</button>
+                                    <button className="rounded-sm px-3 py-1.5 cursor-pointer flex gap-2 items-center hover:bg-gray-100" onClick={()=>(
+                                        navigate("/login")
+                                    )}><User size={16} strokeWidth={2} /> Sign In</button>
                                 </div>
                                 <div>
-                                    <button className="rounded-sm px-3 py-1.5 cursor-pointer flex items-center bg-black hover:bg-gray-800 text-white" onClick={handleLogout}>Join Now</button>
+                                    <button className="rounded-sm px-3 py-1.5 cursor-pointer flex items-center bg-black hover:bg-gray-800 text-white"
+                                    onClick={()=>(
+                                        navigate("/register")
+                                    )}>Join Now</button>
                                 </div>
                             </>
                         )
                     }
                     {
-                        loggedIn && (
+                        userInfo && (
                             <>
                                 <div>
                                     <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 shadow-sm z-50"><ShoppingCart strokeWidth={1} /></button>

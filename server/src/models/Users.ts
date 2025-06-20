@@ -5,11 +5,12 @@ import mongoose from "mongoose"
 
 
 export interface IUser extends Document {
+  [x: string]: any;
   firstName: string;
   secondName?: string;
   email: string;
   gender: "Male" | "Female";
-  password?: string;
+  password: string;
   role?: "Worker" | "Admin" | "User";
   phone?: number;
   Address?: string;

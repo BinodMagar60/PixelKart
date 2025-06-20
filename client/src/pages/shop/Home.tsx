@@ -4,7 +4,7 @@ import Footer from '../../components/Footer'
 import Carousel from '../../components/Carousel'
 import Section from '../../components/Section'
 import Reason from '../../components/Reason'
-
+import { useUserContext } from '../../context/UserContext'
 const Home = () => {
   return (
     <>

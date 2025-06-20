@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 const URI = import.meta.env.VITE_API_URL
 
 interface registerUserType {
@@ -9,16 +9,52 @@ interface registerUserType {
     password: string,
 }
 
+
+interface loginUserType {
+    email: string,
+    password: string,
+}
+
 export const registerUser = async(route:string, data:registerUserType) => {
     try{
-        console.log(URI)
-        const response = await axios.post(URI+route, data)
+        const response = await axios.post(URI+route, data,{
+            withCredentials: true
+        })
         return response.data
+
     }
     catch(error){
-        return error
+        const err = error as AxiosError
+        return err?.response
     }
 }
 
 
+
+export const LoginUser = async(route: string, data: loginUserType) => {
+    try{
+        const response = await axios.post(URI+route, data ,{
+            withCredentials: true
+        })
+        return response.data
+    }
+    catch(error){
+        const err = error as AxiosError
+        return err?.response
+    }
+}
+
+
+export const logoutUser = async(route: string) => {
+    try{
+        const response = await axios.get(URI+route,{
+            withCredentials: true
+        })
+        return response.data
+    }
+    catch(error){
+        const err = error as AxiosError
+        return err?.response
+    }
+}
 
