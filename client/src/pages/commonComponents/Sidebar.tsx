@@ -1,6 +1,7 @@
 import { FolderTreeIcon, Heart, Home, LineChart, Menu, Package, Settings, ShoppingBag, ShoppingCart, Store, User, Users } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react";
-
+import { Link } from "react-router-dom";
+import { useUserContext } from "../../context/UserContext";
 
 
 interface sideBarComponentsTypes {
@@ -37,10 +38,16 @@ type roleType = "User" | "Admin" | "Worker"
 
 
 const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
-
+    const {userInfo} = useUserContext()
     const [sidebar, setSidebar] = useState<sidebarTYpes[] | null>(null)
-
+    // console.log(userInfo)
     const [role, setRole] = useState<roleType>("User")
+    useEffect(()=> {
+        if(userInfo){
+            setRole(userInfo.role!)
+        }
+    },[])
+    console.log(role)
     const [ActiveSidebar, setActiveSidebar] = useState("")
 
     const sideBarComponents: sideBarComponentsTypes = {
@@ -48,130 +55,137 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
             {
                 name: "Profile",
                 icon: <User />,
-                link: "",
+                link: "/account/profile",
             },
             {
                 name: "Overview",
                 icon: <Home />,
-                link: "",
+                link: "/account/overview",
             },
             {
                 name: "User Management",
                 icon: <Users />,
-                link: "",
+                link: "/account/users",
             },
             {
                 name: "Worker Management",
                 icon: <Users />,
-                link: "",
+                link: "/account/workers",
             },
             {
                 name: "Inventory",
                 icon: <Package />,
-                link: "",
+                link: "/account/inventory",
             },
             {
                 name: "Orders",
                 icon: <ShoppingCart />,
-                link: "",
+                link: "/account/order",
             },
             {
                 name: "Categories",
                 icon: <FolderTreeIcon />,
-                link: "",
+                link: "/account/category",
             },
             {
                 name: "Analytics",
                 icon: <LineChart />,
-                link: "",
+                link: "/account/analytic",
             },
             {
                 name: "Setting",
                 icon: <Settings />,
-                link: "",
+                link: "/account/setting",
             }
         ],
         workerSidebar: [
             {
                 name: "Profile",
                 icon: <User />,
-                link: "",
+                link: "/account/profile",
             },
             {
                 name: "User Management",
                 icon: <Users />,
-                link: "",
+                link: "/account/users",
             },
             {
                 name: "Inventory",
                 icon: <Package />,
-                link: "",
+                link: "/account/inventory",
             },
             {
                 name: "Orders",
                 icon: <ShoppingCart />,
-                link: "",
+                link: "/account/order",
             },
             {
                 name: "Setting",
                 icon: <Settings />,
-                link: "",
+                link: "/account/setting",
             }
         ],
         userSidebar: [
             {
                 name: "Profile",
                 icon: <User />,
-                link: "",
+                link: "/account/profile",
             },
             {
                 name: "Dashboard",
                 icon: <Home />,
-                link: "",
+                link: "/account/dashboard",
             },
             {
                 name: "My Purchases",
                 icon: <ShoppingBag />,
-                link: "",
+                link: "/account/mypurchase",
             },
             {
                 name: "My Listings",
                 icon: <Store />,
-                link: "",
+                link: "/account/mylisting",
             },
             {
-                name: "Sold Items",
+                name: "Orders",
                 icon: <Package />,
-                link: "",
+                link: "/account/order",
             },
             {
                 name: "Wishlist",
                 icon: <Heart />,
-                link: "",
+                link: "/account/wishlist",
             },
             {
                 name: "Setting",
                 icon: <Settings />,
-                link: "",
+                link: "/account/setting",
             },
         ],
     }
 
     useEffect(() => {
+    let currentSidebar: sidebarTYpes[] = [];
 
-        if (role === "Admin") {
-            setSidebar(sideBarComponents.adminSidebar)
-            setActiveSidebar(sideBarComponents.adminSidebar[0].name)
-        }
-        else if(role === "Worker"){
-            setSidebar(sideBarComponents.workerSidebar)
-            setActiveSidebar(sideBarComponents.workerSidebar[0].name)
-        }
-        else {
-            setSidebar(sideBarComponents.userSidebar)
-            setActiveSidebar(sideBarComponents.userSidebar[0].name)
-        }
-    }, [role])
+    if (role === "Admin") {
+        currentSidebar = sideBarComponents.adminSidebar;
+    } else if (role === "Worker") {
+        currentSidebar = sideBarComponents.workerSidebar;
+    } else {
+        currentSidebar = sideBarComponents.userSidebar;
+    }
+
+    setSidebar(currentSidebar);
+
+    const matchedItem = currentSidebar.find(item =>
+        location.pathname.startsWith(item.link)
+    );
+    if (matchedItem) {
+        setActiveSidebar(matchedItem.name);
+        setTitle(matchedItem.name);
+    }
+}, [role, location.pathname, setTitle]);
+
 
     return (
         <div className="bg-white w-full h-fit sm:min-h-screen flex flex-col sticky top-0">
@@ -179,13 +193,16 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                 <button className="cursor-pointer" onClick={() => setMenuButton(!menuButton)}><Menu /></button>
                 <button className={`transition-all hidden sm:block ease-in-out duration-500 overflow-hidden ${menuButton ? "" : "w-0"
                     }`}>
+                    <Link to={"/"}>
                     <div className="flex h-full items-center gap-1"><img src="/logo.png" alt="PixelKart" className="h-10" /><span className="text-3xl font-bold">PixelKart</span></div>
+                    </Link>
                 </button>
             </div>
             <div className="border-r border-gray-300 flex-1 overflow-y-auto text-gray-700 pt-10 hidden sm:block">
                 {
                     sidebar?.map((item, index) => (
-                        <div key={index} className={`flex gap-4 p-4 select-none cursor-pointer hover:bg-gray-100 ${ActiveSidebar === item.name ? "text-[#2563EB] border-r-2 border-[#2563EB] bg-[#EFF6FF]" : ""} ${menuButton ? " pr-0" : ""}`}
+                        <Link to={item.link} key={index}>
+                        <div  className={`flex gap-4 p-4 select-none cursor-pointer hover:bg-gray-100 ${ActiveSidebar === item.name ? "text-[#2563EB] border-r-2 border-[#2563EB] bg-[#EFF6FF]" : ""} ${menuButton ? " pr-0" : ""}`}
                             onClick={() => {
                                 setActiveSidebar(item.name)
                                 setTitle(item.name)
@@ -193,7 +210,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                             <div>{item.icon}</div>
                             <div className={`transition-all ease-in-out whitespace-nowrap duration-500 overflow-hidden ${menuButton ? "" : "w-0"
                                 }`}>{item.name}</div>
-                        </div>
+                        </div></Link>
                     ))
                 }
             </div>

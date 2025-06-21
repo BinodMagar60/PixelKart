@@ -29,7 +29,7 @@ interface contextType {
 const UserContext = createContext<contextType | null>(null)
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-    const [userLoading, setUserLoading] = useState(false)
+    const [userLoading, setUserLoading] = useState(true)
     const [userInfo, setUserInfo] = useState<UserType | null>(null)
 
     useEffect(()=>{
@@ -49,7 +49,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                     return
                 }
                 setUserInfo(response.data.userinfo)
-                setUserLoading(false)
             }
             catch(error)
             {
@@ -59,9 +58,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 setUserLoading(false)
             }
         }
-        if(!userInfo){
-            apiCall()
-        }
+        // if(!userInfo){
+        //     apiCall()
+        // }
+        apiCall()
     },[])
 
  

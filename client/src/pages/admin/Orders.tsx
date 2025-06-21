@@ -123,6 +123,7 @@ const Orders = () => {
                                 <td className="py-3">Customer</td>
                                 <td className="py-3">Product</td>
                                 <td className="text-center py-3">Amount</td>
+                                <td className="text-center py-3">QTY</td>
                                 <td className="text-center py-3">Status</td>
                                 <td className="text-center py-3">Date</td>
                                 <td className="text-center py-3">Action</td>
@@ -131,11 +132,12 @@ const Orders = () => {
                         <tbody>
                             {
                                 orderDatas.slice(0, noOfItems).map(item => (
-                                    <tr className="hover:bg-gray-100 rounded-md border-t border-gray-300" key={item.id}>
-                                        <td className="py-3 pl-3 max-w-18">{item.orderId}</td>
-                                        <td className="py-3 capitalize max-w-22 overflow-hidden whitespace-nowrap truncate text-ellipsis">{item.customer}</td>
+                                    <tr className="hover:bg-gray-100 rounded-md border-t border-gray-300 text-sm" key={item.id}>
+                                        <td className="py-3 pl-3 max-w-20">{item.orderId}</td>
+                                        <td className="py-3 capitalize max-w-20 overflow-hidden whitespace-nowrap truncate text-ellipsis">{item.customer}</td>
                                         <td className="py-3 overflow-hidden max-w-40 whitespace-nowrap truncate text-ellipsis">{item.Product}</td>
                                         <td className="text-center py-3">{item.amount}</td>
+                                        <td className="text-center py-3">4</td>
                                         <td className="text-center py-3">
                                             {item.status}
                                         </td>

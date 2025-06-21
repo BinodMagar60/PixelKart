@@ -54,10 +54,6 @@ const Login = () => {
         setLoading(false)
         return
       }
-      toast.success(response.message, {
-        theme: "light",
-        autoClose: 1000,
-      })
       setUserInfo(response?.data)
       setTimeout(() => {
         navigate('/')

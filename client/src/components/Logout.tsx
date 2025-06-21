@@ -15,10 +15,6 @@ const Logout = () => {
             })
             return
         }
-        toast.success(response.message, {
-            autoClose: 1000,
-            theme: "light"
-        })
         setUserInfo(null)
     }
     return (

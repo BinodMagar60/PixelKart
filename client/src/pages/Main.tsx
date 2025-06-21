@@ -3,11 +3,7 @@ import { useState } from "react"
 import Sidebar from "./commonComponents/Sidebar"
 
 import DashboardNavbar from "./commonComponents/DashboardNavbar"
-import MyPurchases from "./user/MyPurchases"
-import Inventory from "./admin/Inventory"
-import MyListings from "./user/MyListings"
-import Orders from "./admin/Orders"
-import Wishlist from "./user/Wishlist"
+import { Outlet } from "react-router-dom"
 
 
 
@@ -20,11 +16,7 @@ const Main = () => {
         <div className="w-full">
             <DashboardNavbar menuButton={menuButton} title={title}/>
             <div className={`pr-10 sm:pr-15 xl:pr-30 pt-8 transition-all ease-in-out duration-500 ${menuButton? "sm:pl-5":"sm:pl-15"}`}>
-              {/* <MyPurchases/> */}
-              {/* <Inventory/> */}
-              {/* <Orders/> */}
-              {/* <MyListings/> */}
-              <Wishlist/>
+              <Outlet/> 
             </div>
         </div>
     </div>

@@ -40,6 +40,7 @@ const Section = ({ sectionName, sectionBackgroundColor }: propsType) => {
           <span key={item}><Card /></span>
         ))} */}
       </div>
+      <div className="w-full flex justify-center"><button className="px-4 py-1 border border-gray-300 rounded-md bg-white cursor-pointer">View All</button></div>
     </div>
   )
 }
