@@ -13,6 +13,7 @@ const authHandler = async(req:Request, res:Response, next: NextFunction) => {
     }
     const verifiedJWT = jwt.verify(cookiedata.token, process.env.JWT_SECRET as string)
     const existingUsers = await User.findById((verifiedJWT as JwtPayload).id).select("-password")
+
     if(!existingUsers){
       res.status(400).json({message: "User not found"})
       return
@@ -21,7 +22,7 @@ const authHandler = async(req:Request, res:Response, next: NextFunction) => {
     next()
     }
     catch(error){
-        res.status(500).json({message: "Server error", error})
+        res.status(500).json({message: "Authentication error", error})
     }
 }
 

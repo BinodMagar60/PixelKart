@@ -4,6 +4,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser'
 import LoginSingnup from './routes/LoginSignup'
+import Account from './routes/Account'
+import Product from './routes/Product'
+import path from 'path';
 
 dotenv.config();
 const app = express();
@@ -18,15 +21,18 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
+
+
+
+app.use("/auth/users", LoginSingnup )
+app.use("/account", Account)
+app.use("/product", Product)
+
 
 app.get('/', (_req, res) => {
   res.send('API is running...');
 });
-
-app.use("/auth/users", LoginSingnup )
-
-
-
 
 mongoose
   .connect(MONGO_URI)

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 
 
-interface UserType{
+export interface UserType{
    _id: string,
   firstName: string;
   secondName?: string;

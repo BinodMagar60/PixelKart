@@ -6,6 +6,7 @@ import { IUser } from "../models/Users";
 import { LoginSchema, RegistreSchema } from "../validation/userValidation";
 import { JwtPayload } from "jsonwebtoken";
 import authHandler from "../middleware/auth";
+import { parse } from "path";
 const router = Router();
 router.post("/register", async (req: Request, res: Response) => {
   try {
@@ -31,7 +32,7 @@ router.post("/register", async (req: Request, res: Response) => {
     const newUser = new User({
       firstName: firstName.toUpperCase(),
       secondName: secondName?.toUpperCase(),
-      email,
+      email: email,
       role: "User",
       password: hashedPassword,
       gender,
@@ -68,7 +69,9 @@ router.post("/register", async (req: Request, res: Response) => {
 
 router.post("/login", async (req: Request, res: Response) => {
   try {
+    console.log(req.body)
     const parsed = LoginSchema.safeParse(req.body);
+    console.log(parsed)
     if (!parsed.success) {
       res.status(400).json({
         message: "Validation Error",
@@ -119,6 +122,7 @@ router.post("/login", async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
 
 router.get("/userinfo", authHandler, async (req: Request, res: Response) => {
   try {

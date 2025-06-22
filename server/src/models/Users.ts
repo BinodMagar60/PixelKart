@@ -1,8 +1,4 @@
-import mongoose from "mongoose"
-
-
-
-
+import mongoose from "mongoose";
 
 export interface IUser extends Document {
   [x: string]: any;
@@ -12,29 +8,33 @@ export interface IUser extends Document {
   gender: "Male" | "Female";
   password: string;
   role?: "Worker" | "Admin" | "User";
-  phone?: number;
+  phone?: number | null;
   Address?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
+const userSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    secondName: { type: String, default: "" },
+    email: { type: String, required: true },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+      required: true,
+      default: "Male",
+    },
+    password: { type: String, default: "" },
+    role: { type: String, enum: ["Worker", "Admin", "User"], default: "User" },
+    phone: { type: Number, default: null },
+    Address: { type: String, default: "" },
+  },
+  {
+    timestamps: true,
+  }
+);
 
+const User = mongoose.models.User || mongoose.model<IUser>("User", userSchema);
 
-
-
-const userSchema = new mongoose.Schema({
-    firstName: { type: String, required: true},
-    secondName: {type: String, default: ""},
-    email: {type: String, required: true},
-    gender: {type: String, enum: ["Male","Female"], required: true, default: "Male"},
-    password: {type: String, default: "" },
-    role: {type: String, enum: ["Worker","Admin","User"], default: "User"},
-    phone: {type: Number},
-    Address: {type: String},
-},{
-    timestamps: true
-});
-
-const User  = mongoose.models.User || mongoose.model<IUser>("User", userSchema)
-
-export default User
+export default User;

@@ -1,5 +1,8 @@
 import { Check, Edit, Plus, Trash2, X } from "lucide-react"
 import { useState } from "react"
+import z from "zod"
+import { addCategorySchema, addNewCategory } from "../../api/ProductAPI";
+import { toast } from "react-toastify";
 
 const Categories = () => {
     const [isOpen, setOpen] = useState(false);
@@ -66,7 +69,7 @@ const Categories = () => {
                     <div className="text-gray-600 text-sm">Manage product categories and subcategories</div>
                 </div>
                 <div>
-                    <button className="p-2 border border-gray-300 rounded-md flex items-center gap-1 bg-black text-white hover:bg-gray-800 cursor-pointer" onClick={()=>setOpen(true)}><span><Plus size={20} /></span> <span>Add Category</span></button>
+                    <button className="p-2 border border-gray-300 rounded-md flex items-center gap-1 bg-black text-white hover:bg-gray-800 cursor-pointer" onClick={() => setOpen(true)}><span><Plus size={20} /></span> <span>Add Category</span></button>
                 </div>
             </div>
 
@@ -111,26 +114,52 @@ const Categories = () => {
     )
 }
 
-const AddCategory = ({setOpen}:{setOpen: React.Dispatch<React.SetStateAction<boolean>>}) => {
+const AddCategory = ({ setOpen }: { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
+    const [category, setCategory] = useState("")
+    
+    const handleSubmit = async() => {
+        
+        const parsed = addCategorySchema.safeParse({category})
+        if(!parsed.success){
+            // console.log(parsed.error.flatten().fieldErrors.category)
+            return toast.error(parsed.error.flatten().fieldErrors.category![0], {
+                autoClose: 1000,
+                theme: "light"
+            })
+        }
+
+        const response = await addNewCategory('addcategory',{category})
+        // console.log(response)
+        if(response.status === 400 || response.status === 500){
+            toast.error(response?.data?.message,{
+                autoClose: 1000,
+                theme: "light",
+            })
+            return
+        }
+        setOpen(false)
+    }
     return (
+
         <div className="absolute top-0 left-0 z-60 w-full h-full min-h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
             <div className="bg-white rounded-md p-4 min-w-70 max-w-30/100 w-full mt-20 lg:mt-45 h-fit">
                 <div className="flex justify-between">
                     <div className="text-xl font-semibold">Add New Category</div>
                     <div>
-                        <button className="border border-gray-300 px-3 py-1 rounded-md" onClick={()=> setOpen(false)}>Close</button>
+                        <button className="border border-gray-300 px-3 py-1 rounded-md" onClick={() => setOpen(false)}>Close</button>
                     </div>
                 </div>
                 <div className="space-y-3 mt-3">
                     <div>Product Categories</div>
-                    <div><input type="text" className="w-full border rounded-md border-gray-300 active:bg-gray-100 px-3 py-1" placeholder="e.g., Laptop"/></div>
+                    <div><input type="text" className="w-full border rounded-md border-gray-300 active:bg-gray-100 px-3 py-1" placeholder="e.g., Laptop" onChange={(e)=>(setCategory(e.target.value))} value={category}/></div>
                 </div>
                 <div>
-                    <button className="w-full px-4 py-1 bg-black text-white hover:bg-gray-800 rounded-md mt-4">Add Category</button>
+                    <button className="w-full px-4 py-1 bg-black text-white hover:bg-gray-800 rounded-md mt-4" onClick={handleSubmit}>Add Category</button>
                 </div>
             </div>
         </div>
     )
 }
+
 
 export default Categories

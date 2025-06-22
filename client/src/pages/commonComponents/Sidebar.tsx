@@ -47,7 +47,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
             setRole(userInfo.role!)
         }
     },[])
-    console.log(role)
+    // console.log(role)
     const [ActiveSidebar, setActiveSidebar] = useState("")
 
     const sideBarComponents: sideBarComponentsTypes = {
