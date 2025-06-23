@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { boolean } from "zod";
 
 export interface IProduct extends Document {
   poster: string;
@@ -11,6 +12,8 @@ export interface IProduct extends Document {
   condition: string;
   qty: number;
   photo: string[];
+  featured: boolean
+  views: Number,
 }
 
 const ProductSchema = new Schema<IProduct>({
@@ -24,6 +27,10 @@ const ProductSchema = new Schema<IProduct>({
   condition: { type: String, required: true },
   qty: { type: Number, required: true },
   photo: [{ type: String }],
+  featured: {type: Boolean, default: false},
+  views: {type: Number, default: 0}
+},{
+  timestamps: true
 });
 
 export const Product = mongoose.model<IProduct>("Product", ProductSchema);

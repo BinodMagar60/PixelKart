@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Navbar from "../../components/Navbar"
 import { Heart, RotateCcw, Shield, ShoppingCart, Star, Truck } from "lucide-react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
-import { useProductContext } from "../../context/productContext"
-// import DOMPurify from 'dompurify';
+import { useProductContext } from "../../context/ProductContext"
+import DOMPurify from 'dompurify';
 
 
 interface productTypes {
@@ -127,7 +127,7 @@ const ProductDetial = () => {
 
 
     const { id } = useParams()
-    const productId = Number(id)
+    const productId = id
     const { products } = useProductContext()
 
     const product = useMemo(() => {
@@ -202,10 +202,10 @@ const ProductDetial = () => {
                         <div className="text-4xl font-bold">{product.productName}</div>
                         <div className="flex gap-4">
                             <span className="flex items-center gap-2"><span><Star color="orange" fill="orange" size={20} /></span> <span className="font-semibold">4.8</span> <span className="text-gray-600">(124 reviews)</span></span>
-                            <span className="text-gray-600">by Binod Magar</span>
+                            <span className="text-gray-600">by {product.poster}</span>
                         </div>
                         <div className="flex gap-2">
-                            <span>Rs.{product.price}</span>
+                            <span className="font-semibold text-xl">Rs.{product.price}</span>
                             {
                                 product.price !== product.originalPrice && (
                                     <>
@@ -220,7 +220,7 @@ const ProductDetial = () => {
                             <span className="">Quantity: </span>
                             <span>
                                 <select name="" id="" className="border bg-white px-2 py-0.5 border-gray-300 rounded-sm mx-2">
-                                    
+
                                 </select>
                                 <span className="text-gray-600 text-sm">(5 available)</span>
                             </span>
@@ -257,8 +257,7 @@ const ProductDetial = () => {
                     {
                         productDetails === "Description" && (
                             <div className="mt-4 text-gray-600 py-4">
-                                this is the description
-                                {/* <div
+                                <div
                                     className="prose prose-sm max-w-none
                                                                     [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:my-2
                                                                     [&_li]:my-1
@@ -266,8 +265,8 @@ const ProductDetial = () => {
                                                                     [&_em]:italic
                                                                     [&_u]:underline
                                                                     [&_p]:my-2"
-                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descriptionValue) }}
-                                /> */}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }}
+                                />
                             </div>
                         )
                     }

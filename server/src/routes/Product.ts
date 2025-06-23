@@ -3,13 +3,31 @@ import Category from "../models/Category";
 import z, { object } from "zod";
 import { Router } from "express";
 import { Product } from "../models/Product";
-import { upload } from "../middleware/multer";
+import User from "../models/Users";
+
+
+interface filteredData {
+    id: string;
+    poster: string;
+    role: string;
+    productName: string;
+    description: string;
+    price: number;
+    originalPrice: number;
+    category: string;
+    condition: string;
+    qty: number;
+    photo: string[];
+    featured: boolean;
+    views: Number;
+    soldNumber: Number
+}
+
 
 const categoryaddValidatorSchema = z.object({
   category: z.string().min(2, "Minimum length required is 2"),
 });
-
-const addProductValidationSchema = z
+const addProductSchema = z
   .object({
     poster: z.string(),
     role: z.string(),
@@ -20,20 +38,22 @@ const addProductValidationSchema = z
     category: z.string().min(1, "Category is required"),
     condition: z.string().min(1, "Condition is required"),
     qty: z.coerce.number().min(1, "Quantity must be at least 1"),
+    photo: z.array(z.string().url())
+      .min(1, "At least one photo is required")
+      .max(5, "Maximum of 5 photos allowed"),
   })
   .refine(
     (data) => {
       if (data.originalPrice !== undefined) {
-        return data.originalPrice > data.price;
+        return data.originalPrice >= data.price;
       }
       return true;
     },
     {
-      message: "Original price must be greater than price",
+      message: "Original price must be greater than or equal to price",
       path: ["originalPrice"],
     }
   );
-
 const router = Router();
 
 router.get("/categories", async (req, res) => {
@@ -73,43 +93,101 @@ router.post("/addcategory", async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
-router.post("/addnewproduct", upload.array("photos", 5), async (req, res) => {
+
+
+
+
+
+router.post("/addnewproduct", async (req, res) => {
+  const parsed = addProductSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    res.status(400).json({
+      message: "Validation failed",
+      errors: parsed.error.flatten().fieldErrors,
+    });
+    return
+  }
+
+  const {
+    poster,
+    role,
+    productName,
+    description,
+    price,
+    originalPrice,
+    category,
+    condition,
+    qty,
+    photo,
+  } = parsed.data;
+
   try {
-    const files = req.files as Express.Multer.File[];
-    console.log(files)
-    console.log(req.body.photo)
-    // Check image files
-    if (!files || files.length === 0) {
-      res.status(400).json({ message: "At least one photo is required" });
-      return
-    }
-    if (files.length > 5) {
-      res.status(400).json({ message: "Maximum 5 photos allowed" });
-      return
-    }
-
-    // Validate the rest of the data
-    const parsed = addProductValidationSchema.safeParse(req.body);
-    if (!parsed.success) {
-      console.log(parsed.error.flatten());
-      res.status(400).json({ message: "Validation failed", errors: parsed.error.flatten() });
-      return
-    }
-
-    const photoPaths = files.map((file) => `/uploads/${file.filename}`);
-
     const newProduct = new Product({
-      ...parsed.data,
-      photo: photoPaths,
+      poster,
+      role,
+      productName,
+      description,
+      price,
+      originalPrice,
+      category,
+      condition,
+      qty,
+      photo,
     });
 
-    await newProduct.save();
+    const savedProduct = await newProduct.save();
 
-    res.status(201).json({ message: "Product created", product: newProduct });
+    res.status(201).json({
+      message: "Product added successfully",
+      product: savedProduct,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to upload product" });
+    res.status(500).json({ message: "Server error", error });
   }
 });
-export default router;
 
+
+router.get('/allproducts', async (req, res) => {
+  try {
+    const allproducts = await Product.find({});
+
+    const filteredData = await Promise.all(
+      allproducts.map(async (item) => {
+        let userData = null;
+
+        if (item.role === "User") {
+          userData = await User.findById(item.poster);
+        }
+
+        return {
+          id: item._id,
+          poster: item.role === "User"
+            ? `${userData?.firstName || "Unknown"} ${userData?.secondName || ""}`
+            : "PixelKart",
+          role: item.role,
+          productName: item.productName,
+          description: item.description,
+          price: item.price,
+          originalPrice: item.originalPrice,
+          category: item.category,
+          condition: item.condition,
+          qty: item.qty,
+          photo: item.photo,
+          featured: item.featured,
+          views: item.views,
+          soldNumber: 0,
+        };
+      })
+    );
+
+    res.status(200).json({ message: "Products pulled", data: filteredData });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+
+export default router;
