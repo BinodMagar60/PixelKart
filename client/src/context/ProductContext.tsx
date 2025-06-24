@@ -11,7 +11,8 @@ import axios from "axios";
 const ProductContext = createContext<ProductContextType | null>(null)
 
 export const ProductProvider = ({ children }: { children: React.ReactNode }) => {
-
+  
+  
   const [selectedProduct, setSelectedProduct] = useState<ProductType>({
     id: "",
     poster: "",
@@ -30,7 +31,8 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
     featured: false,
     views: 0,
     soldNumber: 0,
-    createdAt: null
+    createdAt: null,
+    userWishlist: [],
   })
   const [products, setProducts] = useState<ProductType[]>([])
   const [productLoading, setProductLoading] = useState(true)
@@ -54,10 +56,26 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
   },[])
 
 
+
+  const updateproductwishlist = (pid: string, uid: string) => {
+  const newdata = products.map(prev => {
+    if (prev.id === pid) {
+      const alreadyInWishlist = prev.userWishlist.includes(uid);
+      const updatedWishlist = alreadyInWishlist
+        ? prev.userWishlist.filter(userId => userId !== uid)  
+        : [...prev.userWishlist, uid];                        
+
+      return { ...prev, userWishlist: updatedWishlist };
+    }
+    return prev;
+  });
+  setProducts(newdata);
+};
+
  
 
   return (
-    <ProductContext.Provider value={{ products, setProducts, productLoading, setProductLoading, selectedProduct, setSelectedProduct }}>
+    <ProductContext.Provider value={{ products, setProducts, productLoading, setProductLoading, selectedProduct, setSelectedProduct, updateproductwishlist }}>
       {children}
     </ProductContext.Provider>
   )

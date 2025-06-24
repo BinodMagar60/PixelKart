@@ -3,7 +3,10 @@ import Navbar from "../../components/Navbar"
 import { Cpu, Heart, Laptop, Monitor, Package, RotateCcw, Shield, ShoppingCart, Star, Truck } from "lucide-react"
 import { useParams } from "react-router-dom"
 import { useProductContext } from "../../context/ProductContext"
+import { useUserContext } from "../../context/UserContext"
 import DOMPurify from 'dompurify';
+import { favouriteUpdate } from "../../api/ProductAPI"
+import { toast } from "react-toastify"
 
 
 
@@ -99,11 +102,11 @@ const userReviewers: userReviewersTypes[] = [
 
 
 const ProductDetial = () => {
-
+    const { userInfo } = useUserContext()
     const [productDetailLoading, setProductDetailLoading] = useState(true)
     const { id } = useParams()
     const productId = id
-    const { products } = useProductContext()
+    const { products, updateproductwishlist } = useProductContext()
 
 
 
@@ -118,7 +121,6 @@ const ProductDetial = () => {
 
 
 
-    const [favourite, setfavourite] = useState(true)
     const [productDetails, setProductDetails] = useState<productdetailTypes>("Description")
     const [productRating, setProductRating] = useState<number>(0)
     const [productStarRating, setProductStarRating] = useState<number>(0)
@@ -168,6 +170,30 @@ const ProductDetial = () => {
             }, 1500);
         }
     }, [product])
+
+
+    
+    const favourite = async() => {
+      try{
+        const response = await favouriteUpdate('updatefavourite',{id: productId})
+        // console.log(response)
+        if(response.status === 400 || response.status === 500){
+          toast.error(response.data.message, {
+            autoClose: 1000,
+            theme: 'light'
+          })
+          return
+        }
+    
+        if(productId && userInfo ){
+            updateproductwishlist(productId, userInfo._id)
+        }
+      }
+      catch(error){
+        console.log(error)
+      }
+      
+    }
 
 
     if (!product) {
@@ -269,7 +295,11 @@ const ProductDetial = () => {
                                             <span>Add to Cart</span>
                                         </button>
                                         <button className=" border border-gray-300 w-full bg-white text-black font-semibold p-2 rounded-md cursor-pointer hover:bg-gray-200">Buy Now</button>
-                                        <button className="border p-2.5 rounded-md cursor-pointer border-gray-300 bg-white hover:bg-gray-200 transition-all ease-in-out" onClick={() => setfavourite(!favourite)}><Heart size={20} color={favourite ? "red" : "black"} fill={favourite ? "red" : "white"} /></button>
+                                        {
+                                            userInfo?.role === 'User' && (
+                                                <button className="border p-2.5 rounded-md cursor-pointer border-gray-300 bg-white hover:bg-gray-200 transition-all ease-in-out" onClick={() => favourite()}><Heart size={20} color={product.userWishlist.includes(userInfo?._id)? "red" : "black"} fill={product.userWishlist.includes(userInfo?._id)? "red" : "white"} /></button>
+                                            )
+                                        }
                                     </div>
                                     <div className="w-full border-t border-gray-300 my-4"></div>
                                     <div className="flex justify-evenly pt-5">

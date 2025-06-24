@@ -1,21 +1,42 @@
 import { Heart, StarIcon } from "lucide-react"
-import { useState } from "react"
 import type { ProductType } from "../types/ProductType"
 import { useNavigate } from "react-router-dom"
+import { useUserContext } from "../context/UserContext"
+import { useProductContext } from "../context/ProductContext"
+import { favouriteUpdate } from "../api/ProductAPI"
+import { toast } from "react-toastify"
 
 
 const Card = ({product}: {product: ProductType}) => {
-const [active, setActive] = useState(false)
+const { userInfo } = useUserContext()
+const { updateproductwishlist } = useProductContext()
 const navigate = useNavigate()
 
 const onClickHandle = (id:string) => {
   navigate(`/product/${id}`)
 } 
 
-const favourite = (e: React.MouseEvent<HTMLButtonElement>) => {
+const favourite = async(e: React.MouseEvent<HTMLButtonElement>) => {
   e.preventDefault()
   e.stopPropagation()
-  setActive(!active)
+  try{
+    const response = await favouriteUpdate('updatefavourite',{id: product.id})
+    // console.log(response)
+    if(response.status === 400 || response.status === 500){
+      toast.error(response.data.message, {
+        autoClose: 1000,
+        theme: 'light'
+      })
+      return
+    }
+
+    updateproductwishlist(product.id, userInfo!._id)
+    
+  }
+  catch(error){
+    console.log(error)
+  }
+  
 }
 
   return (
@@ -27,7 +48,11 @@ const favourite = (e: React.MouseEvent<HTMLButtonElement>) => {
         <div className="text-gray-600 text-xs">By {product.poster}</div>
         <div className="flex justify-between items-center">
           <div className="flex gap-2 font-semibold"><span >Rs.{product.price}</span><span className="text-xs text-gray-600 line-through">Rs.{product.originalPrice}</span></div>
-          <button className={`border-1 border-gray-300 p-2 rounded-md cursor-pointer transition-all ease-in duration-400 bg-white` } onClick={favourite} ><Heart size={16} stroke={active? "red":"black"} fill={active? "red":"white"}/></button>
+          {
+            userInfo && userInfo.role === "User" && (
+              <button className={`border-1 border-gray-300 p-2 rounded-md cursor-pointer transition-all ease-in duration-400 bg-white` } onClick={favourite} ><Heart size={16} stroke={product.userWishlist.includes(userInfo?._id)? "red":"black"} fill={product.userWishlist.includes(userInfo?._id)? "red":"white"}/></button>
+            )
+          }
         </div>
       </div>
     </div>

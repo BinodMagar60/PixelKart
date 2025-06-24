@@ -4,6 +4,7 @@ import z, { object } from "zod";
 import { Router } from "express";
 import { Product } from "../models/Product";
 import User from "../models/Users";
+import mongoose from "mongoose";
 
 interface PhotoData {
   id: number;
@@ -27,6 +28,7 @@ interface ProductResponse {
   views: number;
   soldNumber: number;
   createdAt: Date;
+  userWishlist: mongoose.Types.ObjectId[]
 }
 
 
@@ -190,7 +192,8 @@ router.get('/allproducts', async (req, res) => {
           featured: item.featured,
           views: item.views,
           soldNumber: 0,
-          createdAt: item.createdAt
+          createdAt: item.createdAt,
+          userWishlist: item.userWishlist
         };
       })
     );
@@ -202,5 +205,46 @@ router.get('/allproducts', async (req, res) => {
 });
 
 
+
+router.put("/updatefavourite", authHandler, async (req, res) => {
+  try {
+    const { id } = req.body;
+    const userId = (req as any).user._id;
+
+    const product = await Product.findById(id);
+    if (!product){
+      res.status(400).json({ message: "Product not found" });
+      return
+    }
+
+    const isWishlisted = product.userWishlist.includes(userId);
+
+    let updatedProduct;
+
+    if (isWishlisted) {
+  
+      updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        { $pull: { userWishlist: userId } },
+        { new: true }
+      );
+    } else {
+    
+      updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        { $addToSet: { userWishlist: userId } }, 
+        { new: true }
+      );
+    }
+
+    res.status(200).json({
+      message: `Successfully ${isWishlisted ? "removed from" : "added to"} wishlist`,
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Server error", error });
+  }
+});
 
 export default router;

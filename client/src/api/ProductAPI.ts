@@ -62,9 +62,30 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
       formData
     );
 
-    return response.data.secure_url; // ✅ String URL (as Zod expects)
+    return response.data.secure_url; 
   } catch (err: any) {
     console.error("Cloudinary upload error:", err?.response?.data || err.message);
     throw new Error("Failed to upload image to Cloudinary.");
   }
 }
+
+
+export const favouriteUpdate = async(route: string, data:unknown) => {
+    try{
+        const response = await axios.put(URL+route, data, {
+            withCredentials: true
+        })
+        return response.data
+    }
+    catch(error){
+        const err = error as AxiosError
+        return err?.response
+    }
+}
+
+
+
+
+
+
+

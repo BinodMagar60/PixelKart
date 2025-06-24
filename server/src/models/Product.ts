@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { ref } from "process";
 import { boolean } from "zod";
 
 export interface IProduct extends Document {
@@ -15,6 +16,7 @@ export interface IProduct extends Document {
   featured: boolean
   views: Number,
   createdAt: Date,
+  userWishlist: mongoose.Types.ObjectId[], 
 }
 
 const ProductSchema = new Schema<IProduct>({
@@ -29,7 +31,8 @@ const ProductSchema = new Schema<IProduct>({
   qty: { type: Number, required: true },
   photo: [{ type: String }],
   featured: {type: Boolean, default: false},
-  views: {type: Number, default: 0}
+  views: {type: Number, default: 0},
+  userWishlist: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 },{
   timestamps: true
 });

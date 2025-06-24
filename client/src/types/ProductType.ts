@@ -17,6 +17,7 @@ export type ProductType = {
     views: Number;
     soldNumber: Number;
     createdAt: Date | null,
+    userWishlist: string[],
 };
 
 export type ProductContextType = {
@@ -25,5 +26,6 @@ export type ProductContextType = {
   productLoading?: boolean;
   setProductLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedProduct: ProductType,
-  setSelectedProduct: React.Dispatch<React.SetStateAction<ProductType>> 
+  setSelectedProduct: React.Dispatch<React.SetStateAction<ProductType>>,
+  updateproductwishlist: (pid: string, uid: string)=> void
 };
