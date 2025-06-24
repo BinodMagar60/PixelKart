@@ -9,10 +9,14 @@ export type ProductType = {
     category: string;
     condition: string;
     qty: number;
-    photo: string[];
+    photo: [{
+      id: number,
+      url: string,
+    }];
     featured: boolean;
     views: Number;
-    soldNumber: Number
+    soldNumber: Number;
+    createdAt: Date | null,
 };
 
 export type ProductContextType = {

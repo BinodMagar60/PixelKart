@@ -5,23 +5,30 @@ import { Router } from "express";
 import { Product } from "../models/Product";
 import User from "../models/Users";
 
-
-interface filteredData {
-    id: string;
-    poster: string;
-    role: string;
-    productName: string;
-    description: string;
-    price: number;
-    originalPrice: number;
-    category: string;
-    condition: string;
-    qty: number;
-    photo: string[];
-    featured: boolean;
-    views: Number;
-    soldNumber: Number
+interface PhotoData {
+  id: number;
+  url: string;
 }
+
+
+interface ProductResponse {
+  id: string;
+  poster: string;
+  role: string;
+  productName: string;
+  description: string;
+  price: number;
+  originalPrice: number;
+  category: string;
+  condition: string;
+  qty: number;
+  photo: PhotoData[];
+  featured: boolean;
+  views: number;
+  soldNumber: number;
+  createdAt: Date;
+}
+
 
 
 const categoryaddValidatorSchema = z.object({
@@ -161,6 +168,11 @@ router.get('/allproducts', async (req, res) => {
           userData = await User.findById(item.poster);
         }
 
+        const photoData= item.photo.map((item, index) => ({
+          id: index+1,
+          url: item
+        }))
+
         return {
           id: item._id,
           poster: item.role === "User"
@@ -174,10 +186,11 @@ router.get('/allproducts', async (req, res) => {
           category: item.category,
           condition: item.condition,
           qty: item.qty,
-          photo: item.photo,
+          photo: photoData,
           featured: item.featured,
           views: item.views,
           soldNumber: 0,
+          createdAt: item.createdAt
         };
       })
     );

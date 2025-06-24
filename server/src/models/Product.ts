@@ -14,6 +14,7 @@ export interface IProduct extends Document {
   photo: string[];
   featured: boolean
   views: Number,
+  createdAt: Date,
 }
 
 const ProductSchema = new Schema<IProduct>({

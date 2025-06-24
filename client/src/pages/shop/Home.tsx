@@ -15,7 +15,7 @@ const Home = () => {
           <>
             <Navbar />
             <Carousel />
-            <Section sectionName="featured Products" sectionBackgroundColor='bg-transparent' />
+            <Section sectionName="Featured Products" sectionBackgroundColor='bg-transparent' />
             <Section sectionName="New Arrivals" sectionBackgroundColor='bg-white' />
             <Section sectionName="Best Sellers" sectionBackgroundColor='bg-transparent' />
             <Reason />

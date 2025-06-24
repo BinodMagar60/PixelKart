@@ -1,8 +1,7 @@
 import { useState } from "react";
 import Card from "./Card"
 import { Check, ChevronDown } from "lucide-react";
-import type { ProductType } from "../types/ProductType";
-import { useProductContext } from "../context/productContext";
+import { useProductContext } from "../context/ProductContext";
 
 
 type PropsTypes = {
@@ -27,14 +26,20 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
 
     const [selected, setSelected] = useState<optionType>("Highest Rated");
     const [open, setOpen] = useState(false);
+    const [loadmore, setLoadmore] = useState(16)
 
+    const handleLoadMore = () => {
+        if(loadmore < products.length){
+            setLoadmore(prev => prev + 12)
+        }
+    }
 
     return (
         <div className="w-full pb-8">
             <div className="flex justify-between">
                 <div className="hidden sm:block">
                     <div className="font-semibold text-xl">Products</div>
-                    <div className="text-sm text-gray-600 font-semibold">? products found</div>
+                    <div className="text-sm text-gray-600 font-semibold">{products.length} products found</div>
                 </div>
                 <div className="flex gap-2 items-center">
                     <div className="lg:hidden">
@@ -71,13 +76,14 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
                 </div>
                 </div>
             </div>
-            <div className="mt-4 w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <div className="mt-4 w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-x-2 gap-y-4">
                {
-                products.map(item => (
+                products.slice(0,loadmore).map(item => (
                     <span key={item.id}><Card product={item}/></span>
                 ))
                }
             </div>
+            <div className="mb-14 mt-8 w-full flex justify-center"><button className={`px-4 py-2 bg-black border border-gray-300 rounded-md text-white cursor-pointer hover:bg-transparent hover:text-black transition-all duration-300 ease-in-out ${loadmore>products.length? 'hidden':'block'}`} onClick={handleLoadMore}>Load More</button></div>
         </div>
     )
 }

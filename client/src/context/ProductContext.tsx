@@ -23,10 +23,14 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
     category: "",
     condition: "",
     qty: 0,
-    photo: [],
+    photo: [{
+      id: 0,
+      url: ""
+    }],
     featured: false,
     views: 0,
-    soldNumber: 0
+    soldNumber: 0,
+    createdAt: null
   })
   const [products, setProducts] = useState<ProductType[]>([])
   const [productLoading, setProductLoading] = useState(true)

@@ -20,7 +20,7 @@ const favourite = (e: React.MouseEvent<HTMLButtonElement>) => {
 
   return (
     <div className="p-4 rounded-md shadow-md hover:shadow-xl hover:-translate-0.5  bg-white transition max-w-80" onClick={()=>{onClickHandle(product.id)}}>
-      <div><img src={product.photo[0]} alt="motherboard.png" className="h-44 min-w-68 object-cover rounded-md"/></div>
+      <div><img src={product.photo[0].url} alt="motherboard.png" className="h-44 min-w-68 object-cover rounded-md"/></div>
       <div className="space-y-1.5 mt-3 mb-1 text-gray-950">
         <div className="font-semibold leading-tight text-xl">{product.productName}</div>
         <div className="flex gap-1 items-center text-sm"><span className="text-yellow-400 fill-yellow-400 "><StarIcon size={16} fill="yellow-400"/></span> 4.8 (123)</div>
