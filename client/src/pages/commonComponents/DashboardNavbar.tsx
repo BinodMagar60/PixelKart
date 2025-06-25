@@ -55,13 +55,13 @@ const DashboardNavbar = ({ menuButton, title }: SidebarProps) => {
             className="text-left px-2 rounded-sm hover:bg-gray-100 hidden sm:block cursor-pointer"
             onClick={() => setOpen(!isOpen)}
           >
-            <div className="capitalize">{userInfo?.firstName + " " +userInfo?.secondName}</div>
+            <div className="capitalize">{userInfo?.firstName}</div>
             <div className="text-gray-600 text-sm">{userInfo?.role}</div>
           </button>
         </div>
 
         {isOpen && (
-          <div className="absolute w-fit right-0 bg-white shadow-sm text-left text-sm p-1 mt-2">
+          <div className="absolute w-fit right-0 min-w-35 bg-white shadow-sm text-left text-sm p-1 mt-2">
             <div className="hover:bg-gray-100 border-b border-gray-300">
               <div className="w-full px-2 py-1">{userInfo?.firstName + " " +userInfo?.secondName}</div>
               <div className="text-xs text-gray-600 w-full px-2 pb-1">{userInfo?.email}</div>

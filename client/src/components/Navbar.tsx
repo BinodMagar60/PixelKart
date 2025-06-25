@@ -180,10 +180,10 @@ const Navbar = () => {
                                     <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 shadow-sm z-50"><ShoppingCart strokeWidth={1} /></button>
                                 </div>
                                 <div className="relative" ref={dropdownRef}>
-                                    <button className="rounded-sm px-3 py-1.5 cursor-pointer flex gap-2 items-center hover:bg-gray-100" onClick={Profile}><User size={20} strokeWidth={2} />{userInfo.firstName + " " + userInfo.secondName}</button>
+                                    <button className="rounded-sm px-3 py-1.5 cursor-pointer flex gap-2 items-center hover:bg-gray-100" onClick={Profile}><User size={20} strokeWidth={2} />{userInfo.firstName}</button>
                                     {
                                         isOpen && (
-                                            <div className="absolute right-0  min-w-full rounded-sm shadow ">
+                                            <div className="absolute right-0  min-w-32 w-full rounded-sm shadow ">
                                                 <ul>
                                                     {
                                                         dropdownData.map((item, index) => {

@@ -1,10 +1,13 @@
-import { Eye, Info, Search, Trash2} from "lucide-react"
-import { useState } from "react"
+import { Eye, Info, Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { getallusers, resetpasswordAPI } from "../../api/AccountAPI"
+import { toast } from "react-toastify"
+import { formatDateToReadable } from "../../utils/DateConverter"
 
 
 
 interface userDetailType {
-    id: number,
+    id: string,
     firstName: string,
     lastName: string,
     email: string,
@@ -29,7 +32,7 @@ const Users = () => {
     const [searchQuery, setSearchQuery] = useState("")
     const [noOfItems, setNoOfItems] = useState(10)
     const [userDetail, setUserDetail] = useState<userDetailType>({
-        id: 0,
+        id: '',
         firstName: "",
         lastName: "",
         email: "",
@@ -43,344 +46,28 @@ const Users = () => {
         listedItems: 0,
     })
 
-    const [usersData, setUsersData] = useState<userDetailType[]>([
-        {
-            id: 1,
-            firstName: "binod",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 2,
-            firstName: "binod1",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 3,
-            firstName: "binod3",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 4,
-            firstName: "binod4",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 5,
-            firstName: "binod5",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 6,
-            firstName: "Rajan",
-            lastName: "chettri",
-            email: "rajan@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 7,
-            firstName: "binod",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 8,
-            firstName: "binod1",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 9,
-            firstName: "binod3",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 10,
-            firstName: "binod4",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 11,
-            firstName: "binod5",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 12,
-            firstName: "Rajan",
-            lastName: "chettri",
-            email: "rajan@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 13,
-            firstName: "binod",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 14,
-            firstName: "binod1",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 15,
-            firstName: "binod3",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 16,
-            firstName: "binod4",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 17,
-            firstName: "binod5",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 18,
-            firstName: "Rajan",
-            lastName: "chettri",
-            email: "rajan@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 19,
-            firstName: "binod",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 20,
-            firstName: "binod1",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 21,
-            firstName: "binod3",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 22,
-            firstName: "binod4",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 23,
-            firstName: "binod5",
-            lastName: "kaucha",
-            email: "kauchabinod88@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-        {
-            id: 24,
-            firstName: "rahul",
-            lastName: "ranabhat",
-            email: "rahul@gmail.com",
-            joinedDate: "1 Jan, 2025",
-            orders: 12,
-            totalSpent: 12000,
-            address: 'Bharatpur-10, chitwan',
-            phoneNumber: 9800000000,
-            role: "User",
-            gender: "Male",
-            listedItems: 3,
-        },
-    ])
+
+    const [usersData, setUsersData] = useState<userDetailType[]>([])
+
+    useEffect(() => {
+        const apicall = async () => {
+            try {
+                const response = await getallusers('account/usermanagement')
+                if (response.status === 400 || response.status === 500) {
+                    toast.error(response.data.message, {
+                        autoClose: 1000,
+                        theme: 'light'
+                    })
+                    return
+                }
+                setUsersData(response.data)
+            }
+            catch (error) {
+                console.log(error)
+            }
+        }
+        apicall()
+    }, [])
 
     const filteredUsers = usersData.filter((user) => {
         const fullName = (user.firstName + " " + user.lastName).toLowerCase();
@@ -390,12 +77,6 @@ const Users = () => {
     })
 
 
-    const onDelete = (id: number) => {
-        const newData = usersData.filter(item => item.id != id)
-        setUsersData(newData)
-    }
-
-    
 
     return (
         <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm">
@@ -409,7 +90,7 @@ const Users = () => {
                         <input type="text" placeholder="Search here..." className="border border-gray-300 h-fit px-3 py-1.5 w-70 rounded-tl-md rounded-bl-md focus:bg-gray-100" value={searchQuery} onChange={(e) => (setSearchQuery(e.target.value))} />
                         <button className="border-1 h-fit p-1.5 px-2 bg-black text-white rounded-br-md rounded-tr-md border-black hover:bg-gray-900 cursor-pointer"><Search size={24} /></button>
                     </form>
-                    
+
                 </div>
             </div>
             <div className="mt-10">
@@ -430,15 +111,14 @@ const Users = () => {
                                 <tr key={item.id} className="hover:bg-gray-100 rounded-md border-t border-gray-300">
                                     <td className="py-3 pl-3 capitalize ">{item.firstName + " " + item.lastName}</td>
                                     <td className="py-3">{item.email}</td>
-                                    <td className="text-center py-3">{item.joinedDate}</td>
+                                    <td className="text-center py-3">{formatDateToReadable(item.joinedDate)}</td>
                                     <td className="text-center py-3">{item.orders}</td>
                                     <td className="text-center py-3">{item.totalSpent}</td>
                                     <td className="flex justify-center gap-3 py-3 pr-3">
-                                        <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white" onClick={() => {
+                                        <button className="p-2 flex gap-2 items-center cursor-pointer border border-gray-300 rounded-md hover:bg-white" onClick={() => {
                                             setUserDetail(item)
                                             setUserDetailsOpen(true)
-                                        }}><Eye size={20} /></button>
-                                        <button className="p-2 cursor-pointer border border-red-500 rounded-md text-white bg-red-500 hover:bg-red-400 hover:border-red-400" onClick={() => onDelete(item.id)}><Trash2 size={20} /></button>
+                                        }}><Eye size={20} /> <span>View</span></button>
                                     </td>
                                 </tr>
                             ))
@@ -446,7 +126,7 @@ const Users = () => {
                     </tbody>
                 </table>
                 <div className="w-full flex justify-center">
-                    <button className={`border border-gray-300 px-3 py-2 rounded-md cursor-pointer text-white bg-black hover:border-black hover:text-black hover:bg-white transition-all duration-100 ease-in-out ${noOfItems > usersData.length? "hidden":"block"}`} onClick={()=>(setNoOfItems(prev => prev + 10))}>Load More</button>
+                    <button className={`border border-gray-300 px-3 py-2 rounded-md cursor-pointer text-white bg-black hover:border-black hover:text-black hover:bg-white transition-all duration-100 ease-in-out ${noOfItems > usersData.length ? "hidden" : "block"}`} onClick={() => (setNoOfItems(prev => prev + 10))}>Load More</button>
                 </div>
             </div>
 
@@ -464,6 +144,30 @@ const Users = () => {
 
 
 const UserDetailsCard = ({ userDetail, setUserDetailsOpen }: UserDetailsCardProps) => {
+
+    const resetpassword = async () => {
+
+        try {
+            const response = await resetpasswordAPI('account/resetpassword', { id: userDetail.id })
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+            toast.success('Password Resetted', {
+                autoClose: 1000,
+                theme: 'light'
+            })
+
+        }
+        catch (error) {
+            console.log(error)
+        }
+
+    }
+
     return (
         <div className="absolute top-0 left-0 z-60 w-full h-full min-h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
             <div className="bg-white rounded-md max-w-70/100 w-full h-fit mt-10 lg:mt-25 p-6">
@@ -484,21 +188,30 @@ const UserDetailsCard = ({ userDetail, setUserDetailsOpen }: UserDetailsCardProp
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-3">
-                            <div>Join Date</div>
-                            <div className="border border-gray-300 rounded-md px-3 py-2 text-gray-800">{userDetail.joinedDate}</div>
+                            <div>Joined Date</div>
+                            <div className="border border-gray-300 rounded-md px-3 py-2 text-gray-800">{formatDateToReadable(userDetail.joinedDate)}</div>
                         </div>
                         <div className="space-y-3">
                             <div>Address</div>
-                            <div className="border border-gray-300 rounded-md px-3 py-2 text-gray-800">{userDetail.address}</div>
+                            <div className="border border-gray-300 rounded-md px-3 py-2 text-gray-800">{userDetail.address ? userDetail.address : "Not provided"}</div>
                         </div>
                     </div>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                            <div>Phone</div>
+                            <div className="border border-gray-300 rounded-md px-3 py-2 text-gray-800">{userDetail.phoneNumber ? userDetail.phoneNumber : "Not provided"}</div>
+                        </div>
+                        <div className="space-y-3">
                             <div>Reset Password</div>
                             <div className="flex gap-3">
-                                <button className="px-3 py-2 text-white bg-black cursor-pointer rounded-md hover:bg-gray-900">Reset Password</button>
+                                <button className="px-3 py-2 text-white bg-black cursor-pointer rounded-md hover:bg-gray-900" onClick={resetpassword}>Reset Password</button>
                                 <span className="text-sm text-gray-600 flex items-end gap-1"><Info size={20} /> <span className="font-semibold">Reseted password will be: 12345678</span></span>
                             </div>
                         </div>
+                    </div>
+                    <div className="space-y-3">
+
+                    </div>
                 </div>
                 <div className="space-y-4 mt-8">
                     <div className="text-xl font-semibold">User Statistics</div>

@@ -69,9 +69,9 @@ router.post("/register", async (req: Request, res: Response) => {
 
 router.post("/login", async (req: Request, res: Response) => {
   try {
-    // console.log(req.body)
+    
     const parsed = LoginSchema.safeParse(req.body);
-    // console.log(parsed)
+   
     if (!parsed.success) {
       res.status(400).json({
         message: "Validation Error",

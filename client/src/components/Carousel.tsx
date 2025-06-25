@@ -74,7 +74,7 @@ const Carousel = () => {
                     return (
                         <div key={item.id} className={`bg-center h-full w-full absolute transition-all duration-500 ease-in-out ${item.id === cardNo
                                 ? "opacity-100 z-10"
-                                : "opacity-50 "
+                                : "opacity-0 "
                             }`} style={{
                                 background: `url('${item.image}')`
                             }}>
@@ -83,7 +83,7 @@ const Carousel = () => {
                                     <div className="text-white text-6xl font-bold">{item.name}</div>
                                     <div className="text-white text-xl mt-5">{item.description}</div>
                                     <div><button className="border-1 border-white text-black bg-[#e6e6e6] hover:text-white hover:bg-transparent transition-all px-3 py-2 text-xl font-bold rounded-sm hover: mt-5 cursor-pointer">{item.buttonDetail}</button></div>
-                                </div>
+                                </div>  
                             </div>
                         </div>
                     )

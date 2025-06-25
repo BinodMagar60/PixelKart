@@ -1,8 +1,10 @@
 import { AlertCircle, Eye, EyeOff, Save, X } from "lucide-react"
 import { useState } from "react"
+import { changepasswordAPI } from "../../api/AccountAPI"
+import { toast } from "react-toastify"
 
 
-interface passowordType {
+export interface passowordType {
   currentPassword: string,
   newPassword: string,
   confirmPassword: string
@@ -17,7 +19,7 @@ interface passowordShowType {
 type fieldType = "currentPassword" | "newPassword" | "confirmPassword"
 
 const Setting = () => {
-
+  const [loading, setLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const [password, setPassword] = useState<passowordType>({
@@ -83,13 +85,13 @@ const Setting = () => {
       newErrors.newPassword = "New password is required";
       isValid = false;
     }
-    
+
     else if (password.newPassword.length < 8) {
       newErrors.newPassword = "Password must be at least 8 characters long";
       isValid = false;
     } else if (!passwordRegex.test(password.newPassword)) {
       newErrors.newPassword = "Password doesn't meet the requirements.";
-      isValid = false; 
+      isValid = false;
     }
 
     if (password.newPassword !== password.confirmPassword) {
@@ -102,14 +104,38 @@ const Setting = () => {
   };
 
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      setPassword({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setSuccessMessage("Password Updated Successfully")
+  const handleSubmit = async () => {
+    try {
+      setLoading(true)
+      setSuccessMessage('')
+      if (!validateForm()) {
+        return
+      }
+
+      const response = await changepasswordAPI('account/changepassword', password)
+      // console.log(response)
+      if (response.status === 400 || response.status === 500) {
+        toast.error(response.data.message, {
+          autoClose: 1000,
+          theme: 'light'
+        })
+        setLoading(false)
+        return
+      }
+      setTimeout(() => {
+
+        setSuccessMessage("Sucessfully password changed")
+
+        setPassword({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setLoading(false)
+      }, 1500);
+    }
+    catch (error) {
+      console.log(error)
     }
   }
 
@@ -122,11 +148,11 @@ const Setting = () => {
         <div className="text-gray-600 text-sm">Ensure your account remains secure by creating a strong password</div>
       </div>
       {successMessage && (
-            <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex justify-between">
-              <span>{successMessage}</span>
-              <button className="hover:text-green-800 cursor-pointer" onClick={()=> setSuccessMessage(null)}><X size={20}/></button>
-            </div>
-          )}
+        <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex justify-between">
+          <span>{successMessage}</span>
+          <button className="hover:text-green-800 cursor-pointer" onClick={() => setSuccessMessage(null)}><X size={20} /></button>
+        </div>
+      )}
       <div className="font-semibold text-lg mb-4">Change password</div>
       <div className="space-y-4">
         <div className="space-y-2">
@@ -180,7 +206,7 @@ const Setting = () => {
         </ul>
       </div>
       <div className="flex justify-end">
-        <button className="bg-black rounded-md text-white flex px-3 gap-2 cursor-pointer py-2 items-center hover:bg-gray-800" onClick={handleSubmit}><span><Save size={20} /></span><span>Update Password</span></button>
+        <button className="bg-black rounded-md text-white flex px-3 gap-2 cursor-pointer py-2 items-center hover:bg-gray-800" onClick={handleSubmit} disabled={loading}><span><Save size={20} /></span><span>Update Password</span></button>
       </div>
     </div>
   )

@@ -11,7 +11,7 @@ const loadings: Record<LoadingKey, { text: string; icon: ReactElement }> = {
   productloading: {
     text: "Adding Category",
     icon: <Plus className="w-8 h-8 text-white"/>
-  }
+  },
 };
 
 const LoadingScreen = ({ loadingObject }: { loadingObject: LoadingKey }) => {
