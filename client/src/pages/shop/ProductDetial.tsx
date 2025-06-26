@@ -257,7 +257,7 @@ const ProductDetial = () => {
                                     </div>
                                 </div>
                                 <div className="w-full space-y-3">
-                                    <div className="bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl">{product?.condition}</div>
+                                    <div className={`bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl ${product.qty === 0 ? "bg-red-500":""}`}>{product.qty > 0 ? product?.condition : "Out of stock"}</div>
                                     <div className="text-4xl font-bold">{product?.productName}</div>
                                     <div className="flex gap-4">
                                         <span className="flex items-center gap-2"><span><Star color="orange" fill="orange" size={20} /></span> <span className="font-semibold">4.8</span> <span className="text-gray-600">(124 reviews)</span></span>

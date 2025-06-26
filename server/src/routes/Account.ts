@@ -5,6 +5,8 @@ import { Router } from "express";
 import { UserUpdateSchema } from "../validation/userValidation";
 import z from "zod";
 import { log } from "console";
+import Category from "../models/Category";
+import { Product } from "../models/Product";
 
 const updatepasswordvalidation = z
   .object({
@@ -121,7 +123,6 @@ router.put("/resetpassword", authHandler, async (req, res) => {
   }
 });
 
-
 router.get("/usermanagement", async (req, res) => {
   try {
     const allUsers = await User.find({ role: "User" }).select(
@@ -149,16 +150,15 @@ router.get("/usermanagement", async (req, res) => {
   }
 });
 
-
-router.post('/workermanagement', async(req, res) => {
-  try{
-    const {firstName, secondName, Address, phone, email, gender} = req.body
-    const existingUser = await User.findOne({email: email})
-    if(existingUser){
-      res.status(400).json({message: 'Email already exists'})
-      return
+router.post("/workermanagement", async (req, res) => {
+  try {
+    const { firstName, secondName, Address, phone, email, gender } = req.body;
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+      res.status(400).json({ message: "Email already exists" });
+      return;
     }
-    const password = bcrypt.hashSync('12345678', 12)
+    const password = bcrypt.hashSync("12345678", 12);
     const newUser = new User({
       firstName,
       secondName,
@@ -166,16 +166,15 @@ router.post('/workermanagement', async(req, res) => {
       phone,
       email,
       gender,
-      role: 'Worker',
-      password
-    })
-    await newUser.save()
-    res.status(200).json({message: 'Worker Added'})
-  }catch(error){
-    res.status(500).json({message: 'Server error', error})
+      role: "Worker",
+      password,
+    });
+    await newUser.save();
+    res.status(200).json({ message: "Worker Added" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
-})
-
+});
 
 router.get("/workermanagement", async (req, res) => {
   try {
@@ -203,16 +202,120 @@ router.get("/workermanagement", async (req, res) => {
 
 router.delete("/workermanagement", async (req, res) => {
   try {
-   const {id} = req.body
-   const deletedUser = await User.findByIdAndDelete(id)
-   if(!deletedUser){
-    res.status(400).json({message: 'User doesnt exist'})
-    return
-   }
-   res.status(200).json({message: 'User deleted'})
+    const { id } = req.body;
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      res.status(400).json({ message: "User doesnt exist" });
+      return;
+    }
+    res.status(200).json({ message: "User deleted" });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
 });
+
+//category
+router.get("/category", async (req, res) => {
+  try {
+    const allData = await Category.find();
+    const allproducts = await Product.find();
+    const safeData = allData.map((item) => {
+      const productCount = allproducts.filter(
+        (product) => product.category === item.category
+      ).length;
+      return {
+        id: item._id,
+        categoryName: item.category,
+        Product: productCount,
+      };
+    });
+    res.status(200).json({ message: "Category data", safeData });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.delete("/category", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const category = await Category.findById(id);
+    const isCategoryBeingUsed = await Product.find({
+      category: category?.category,
+    });
+    if (isCategoryBeingUsed.length > 0) {
+      res
+        .status(400)
+        .json({
+          message:
+            "The category you are trying to delete is being used by products",
+        });
+      return;
+    }
+
+    const deleteData = await Category.findByIdAndDelete(id);
+    if (!deleteData) {
+      res.status(400).json({ message: "No category found" });
+      return;
+    }
+    res.status(200).json({ message: "Data deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+
+//inventory
+router.get("/inventory", async (req, res) => {
+  try {
+    const allData = await Product.find();
+    const safeData = allData.map(item =>({
+      id: item._id,
+      productName: item.productName,
+      category: item.category,
+      price: item.price,
+      originalPrice: item.originalPrice,
+      stock: item.qty,
+      sales: 0,
+      featured: item.featured
+    }))
+
+    res.status(200).json({message: 'Data sent', safeData})
+    
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+
+router.put('/inventory', async(req, res) => {
+  try {
+    const {id, productName, category, price, originalPrice, stock, featured} = req.body
+    const updatedData = await Product.findByIdAndUpdate(id,
+      {
+        productName: productName,
+        category: category,
+        price: price,
+        originalPrice: originalPrice,
+        qty: stock,
+        featured: featured
+      },
+      {new: true}
+    )
+    if(!updatedData){
+      res.status(400).json({message: 'Couldnt find the product'})
+      return
+    }
+    res.status(200).json({message: 'Product updated', updatedData})
+
+  } catch (error) {
+    res.status(500).json({message:'Server error', error})
+  }
+})
+
+
+
+
 
 export default router;

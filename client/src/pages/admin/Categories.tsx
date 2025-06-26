@@ -1,62 +1,67 @@
-import { Check, Edit, Plus, Trash2, X } from "lucide-react"
-import { useState } from "react"
-import z from "zod"
+import { Plus, Trash2, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { addCategorySchema, addNewCategory } from "../../api/ProductAPI";
 import { toast } from "react-toastify";
+import { deletecategory, getcategory} from "../../api/AccountAPI";
+
+
+export interface categoriesDataType {
+    id: string;
+    categoryName: string;
+    Product: number;
+}
 
 const Categories = () => {
+    const [change, setchange] = useState(false)
     const [isOpen, setOpen] = useState(false);
     const [warning, setWarning] = useState(false)
-    const [editableId, setEditablId] = useState<number | null>(null)
-    const [categoriesData, setCategoriesData] = useState([
-        {
-            id: 1,
-            categoryName: "Laptop",
-            Product: 123,
-        },
-        {
-            id: 2,
-            categoryName: "GPU",
-            Product: 123,
-        },
-        {
-            id: 3,
-            categoryName: "Motherboard",
-            Product: 123,
-        },
-        {
-            id: 4,
-            categoryName: "Monitor",
-            Product: 123,
-        },
-        {
-            id: 5,
-            categoryName: "Pc",
-            Product: 123,
-        },
-        {
-            id: 6,
-            categoryName: "RAM",
-            Product: 0,
-        },
-    ])
+    const [categoriesData, setCategoriesData] = useState<categoriesDataType[]>([])
 
-
-    const onCategoryNameChange = (newValue: string, id: number) => {
-        const newData = categoriesData.map(item => {
-            if (id === item.id) {
-                return { ...item, categoryName: newValue }
+    useEffect(() => {
+        const api = async () => {
+            try {
+                const response = await getcategory('account/category')
+                if (response.status === 400 || response.status === 500) {
+                    toast.error(response.data.message, {
+                        autoClose: 1000,
+                        theme: 'light'
+                    })
+                    return
+                }
+                setCategoriesData(response.safeData)
             }
-            return item
-        })
-        setCategoriesData(newData)
+            catch (error) {
+                console.log(error)
+            }
+        }
+        api()
+    }, [change])
+
+
+    const onchangehandle = () => {
+        return null
     }
 
-    const handleDelete = (id: number, productCount: number) => {
-        if (productCount > 0) {
-            setWarning(true);
-        } else {
-            setCategoriesData(prev => prev.filter(item => item.id !== id));
+ 
+
+    const handleDelete = async (id: string, productCount: number) => {
+        try {
+            if (productCount > 0) {
+                setWarning(true);
+                return
+            }
+            const response = await deletecategory('account/category', { id })
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+            setchange(prev => !prev)
+        }
+        catch (error) {
+            console.log(error)
         }
     };
 
@@ -73,9 +78,9 @@ const Categories = () => {
                 </div>
             </div>
 
-            <div className={`w-full flex justify-between items-center my-2 bg-red-600  px-4 py-2 text-gray-100 rounded-md ${warning ? "block" : "hidden"}`}>
-                <span >There are items that are on the category</span>
-                <button className={`border border-gray-300 p-1 cursor-pointer rounded-md text-white`} onClick={() => setWarning(false)}><X size={16} /></button>
+            <div className={`w-full flex justify-between items-center my-2 border bg-red-300 text-red-500 border-red-600  px-4 py-2 rounded-md ${warning ? "block" : "hidden"}`}>
+                <span >The category you are trying to delete is being used by products</span>
+                <button className={`border border-red-500 text-red-500 p-1 cursor-pointer rounded-md`} onClick={() => setWarning(false)}><X size={16} /></button>
             </div>
 
             <div>
@@ -90,13 +95,12 @@ const Categories = () => {
                         </thead>
                         <tbody>
                             {
-                                categoriesData.map(item => (
+                                categoriesData.map((item) => (
                                     <tr className="hover:bg-gray-100 rounded-md border-t border-gray-300" key={item.id}>
-                                        <td className="py-3 pl-3 max-w-18"><input type="text" value={item.categoryName} className={`w-full font-semibold border rounded-md px-3 py-1 ${editableId === item.id ? "border-gray-300" : "border-transparent"}`} onChange={(e) => onCategoryNameChange(e.target.value, item.id)} disabled={editableId !== item.id} /></td>
+                                        <td className="py-3 pl-3 max-w-18"><input type="text" value={item.categoryName} className={`w-full font-semibold rounded-md px-3 py-1 border-0`} onChange={onchangehandle} disabled/></td>
                                         <td className="py-3 text-center">{item.Product}</td>
                                         <td className="pr-2">
                                             <div className="flex gap-2 justify-center">
-                                                <button className="p-2 border border-gray-300 rounded-md cursor-pointer" onClick={() => setEditablId(editableId === item.id ? null : item.id)}>{editableId === item.id ? <Check size={16} /> : <Edit size={16} />}</button>
                                                 <button className="p-2 border border-red-300 rounded-md bg-red-500 text-white cursor-pointer" onClick={() => handleDelete(item.id, item.Product)}><Trash2 size={16} /></button>
                                             </div>
                                         </td>
@@ -108,36 +112,35 @@ const Categories = () => {
                 </div>
             </div>
             {
-                isOpen && <AddCategory setOpen={setOpen} />
+                isOpen && <AddCategory setOpen={setOpen} setchange={setchange} />
             }
         </div>
     )
 }
 
-const AddCategory = ({ setOpen }: { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const AddCategory = ({ setOpen, setchange }: { setOpen: React.Dispatch<React.SetStateAction<boolean>>, setchange: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const [category, setCategory] = useState("")
-    
-    const handleSubmit = async() => {
-        
-        const parsed = addCategorySchema.safeParse({category})
-        if(!parsed.success){
-            // console.log(parsed.error.flatten().fieldErrors.category)
+
+    const handleSubmit = async () => {
+
+        const parsed = addCategorySchema.safeParse({ category })
+        if (!parsed.success) {
             return toast.error(parsed.error.flatten().fieldErrors.category![0], {
                 autoClose: 1000,
                 theme: "light"
             })
         }
 
-        const response = await addNewCategory('addcategory',{category})
-        // console.log(response)
-        if(response.status === 400 || response.status === 500){
-            toast.error(response?.data?.message,{
+        const response = await addNewCategory('addcategory', { category })
+        if (response.status === 400 || response.status === 500) {
+            toast.error(response?.data?.message, {
                 autoClose: 1000,
                 theme: "light",
             })
             return
         }
         setOpen(false)
+        setchange(prev => !prev)
     }
     return (
 
@@ -151,7 +154,7 @@ const AddCategory = ({ setOpen }: { setOpen: React.Dispatch<React.SetStateAction
                 </div>
                 <div className="space-y-3 mt-3">
                     <div>Product Categories</div>
-                    <div><input type="text" className="w-full border rounded-md border-gray-300 active:bg-gray-100 px-3 py-1" placeholder="e.g., Laptop" onChange={(e)=>(setCategory(e.target.value))} value={category}/></div>
+                    <div><input type="text" className="w-full border rounded-md border-gray-300 active:bg-gray-100 px-3 py-1" placeholder="e.g., Laptop" onChange={(e) => (setCategory(e.target.value))} value={category} /></div>
                 </div>
                 <div>
                     <button className="w-full px-4 py-1 bg-black text-white hover:bg-gray-800 rounded-md mt-4" onClick={handleSubmit}>Add Category</button>

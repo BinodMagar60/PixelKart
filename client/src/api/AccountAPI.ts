@@ -1,6 +1,8 @@
-import axios, { AxiosError } from "axios";
+import axios, {  AxiosError } from "axios";
 import type { passowordType } from "../pages/commonComponents/Setting";
 import type { workeraddtype } from "../pages/admin/Workers";
+
+import type { productTypes } from "../pages/admin/Inventory";
 const URI = import.meta.env.VITE_API_URL;
 
 export type userProfileType = {
@@ -77,6 +79,57 @@ export const getallusers = async (route: string) => {
     return err?.response;
   }
 };
+
+
+//category
+
+export const getcategory = async(route: string) => {
+  try {
+    const response = await axios.get(URI + route);
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError;
+    return err?.response;
+  }
+}
+
+
+export const deletecategory = async(route: string, data: {id: string}) => {
+  try {
+    const response = await axios.delete(URI + route, {data: data});
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError;
+    return err?.response;
+  }
+}
+
+
+//inventory
+
+export const getinventory = async(route: string) => {
+  try {
+    const response = await axios.get(URI + route);
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError;
+    return err?.response;
+  }
+}
+
+
+export const updateinventory = async(route: string, data: productTypes) => {
+  try {
+    const response = await axios.put(URI + route, data)
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}
+
+
+
 
 
 

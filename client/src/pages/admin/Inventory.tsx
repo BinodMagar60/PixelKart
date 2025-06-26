@@ -1,181 +1,83 @@
-import { Edit, Eye, Plus, Save, Search, Trash2, X } from "lucide-react"
-import { useState } from "react"
+import { Edit, Eye, Plus, Save, Search, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
 import AddProduct from "../commonComponents/AddProduct"
+import { getcategory, getinventory, updateinventory } from "../../api/AccountAPI"
+import { toast } from "react-toastify"
+import z from 'zod'
+import type { categoriesDataType } from "./Categories"
 
 
-interface productTypes {
-    id: number,
+export interface productTypes {
+    id: string,
     productName: string,
     category: string,
     price: number,
+    originalPrice: number,
     stock: number,
-    status: boolean,
     sales: number,
     featured: boolean,
 }
 
-interface warningType {
-    isOpen: boolean,
-    message: string,
-    color: string
-}
+const productValidation = z.object({
+    id: z.string({required_error: 'Product id error'}),
+    productName: z.string({required_error: 'Product name is required'}),
+    category: z.string({required_error: 'Category is required'}),
+    price: z.number({required_error: 'Price is required'}),
+    originalPrice: z.number({required_error: 'Original price is required'}),
+    stock: z.number(),
+    sales: z.number(),
+    featured: z.boolean(),
+}).refine((data) => {
+    return data.originalPrice >= data.price
+},
+    {
+        path: ["originalPrice"],
+        message: 'Price cannot be greater than original price'
+    })
 
 const Inventory = () => {
-    const [warning, setWarning] = useState<warningType>({
-        isOpen: false,
-        message: "",
-        color: ""
-    })
+    const [change, setchange] = useState(false)
     const [isAddCardOpen, setAddCardOpen] = useState(false)
     const [isEditOpen, setEditOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [noOfItems, setNoOfItems] = useState(10)
-    const [itemsDetail, setItemsDetail] = useState([
-        {
-            id: 1,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: true,
-        },
-        {
-            id: 2,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Motherboard",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: true,
-        },
-        {
-            id: 3,
-            productName: "Gaming Laptop RTX 4070",
-            category: "GPU",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 4,
-            productName: "Keybaord",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 5,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 6,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 7,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 8,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 9,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: true,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 10,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: false,
-            sales: 10,
-            featured: false,
-        },
-        {
-            id: 11,
-            productName: "Gaming Laptop RTX 4070",
-            category: "Laptop",
-            price: 200000,
-            stock: 15,
-            status: false,
-            sales: 10,
-            featured: false,
-        },
-    ])
+    const [itemsDetail, setItemsDetail] = useState<productTypes[]>([])
+    const [category, setcategory] = useState<categoriesDataType[]>([])
     const [selectedProduct, setSelectedProduct] = useState<productTypes>({
-        id: 0,
+        id: '',
         productName: "",
-        category: "",
+        category: '',
         price: 0,
+        originalPrice: 0,
         stock: 0,
-        status: false,
         sales: 0,
         featured: false,
     })
 
-    const handleStatusChange = (id: number) => {
-        const newData = itemsDetail.map(item => {
-            if (item.id === id) {
-                return { ...item, status: !item.status }
+    useEffect(() => {
+        const apicall = async () => {
+            try {
+                const response = await getinventory('account/inventory')
+                const response2 = await getcategory('account/category')
+
+                if (response.status === 400 || response.status === 500) {
+                    toast.error(response.data.message, {
+                        autoClose: 1000,
+                        theme: 'light'
+                    })
+                    return
+                }
+                setItemsDetail(response.safeData)
+                setcategory(response2.safeData)
+
+            } catch (error) {
+                console.log(error)
             }
-            return item
-        })
+        }
+        apicall()
+    }, [change])
 
-        setItemsDetail(newData);
-    };
-
-    const handleStockChange = (id: number, value: number) => {
-        const newData = itemsDetail.map(item => {
-            if (item.id === id) {
-                return { ...item, stock: value }
-            }
-            return item
-        })
-
-        setItemsDetail(newData)
-    }
-
-
+   
     const filteredItems = itemsDetail.filter((item) => {
         const productName = item.productName.toLowerCase();
         return (
@@ -183,18 +85,41 @@ const Inventory = () => {
         )
     })
 
-    const handleUpdate = (Data: productTypes) => {
-        const newData = itemsDetail.map(item => {
-            if (item.id === Data.id) {
-                return Data
+    const handleUpdate = async (Data: productTypes) => {
+        try {
+            console.log(Data)
+            const parsed = productValidation.safeParse(Data);
+            if (!parsed.success) {
+                const errors = parsed.error.flatten().fieldErrors;
+                console.log(errors)
+                const firstError = Object.values(errors).flat()[0];
+                toast.error(firstError || "Validation failed", {
+                    autoClose: 1000,
+                    theme: "light",
+                });
+                return;
             }
-            return item
-        })
+            
+            const response = await updateinventory('account/inventory', Data);
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: "light",
+                });
+                return;
+            }
 
-        setItemsDetail(newData)
-        setWarning({ isOpen: true, message: "Product successfull updated", color: "border-green-500 bg-green-300 text-green-600" })
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: "light",
+            });
+            setchange(prev => !prev);
 
-    }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
 
     return (
         <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
@@ -224,9 +149,9 @@ const Inventory = () => {
                                         <td className="py-3">Category</td>
                                         <td className="text-center py-3">Price (Rs)</td>
                                         <td className="text-center py-3">Stocks</td>
-                                        <td className="text-center py-3">Status</td>
+
                                         <td className="text-center py-3">Sales</td>
-                                        <td className="text-center py-3">Visiblility</td>
+
                                         <td className="text-center py-3 pr-3">Actions</td>
                                     </tr>
                                 </thead>
@@ -237,24 +162,13 @@ const Inventory = () => {
                                                 <td className="py-3 pl-3">{item.productName}</td>
                                                 <td className="py-3 capitalize">{item.category}</td>
                                                 <td className="text-center py-3">{item.price}</td>
-                                                <td className="text-sm"><div className="flex justify-center"><input type="number" className="border border-gray-300 rounded-md px-3 py-1 max-w-20" value={item.stock} onChange={(e) => handleStockChange(item.id, Number(e.target.value))} /></div></td>
-                                                <td className="text-sm"><div className="flex justify-center"><div className="rounded-full px-3 py-0.5 bg-black text-white w-fit">{item.status ? "Active" : "Offline"}</div></div></td>
+                                                <td className="text-sm"><div className="flex justify-center">{item.stock}</div></td>
+
                                                 <td className="text-center">{item.sales}</td>
-                                                <td>
-                                                    <div className="flex justify-center">
-                                                        <button className={`w-12 border rounded-full border-gray-300 transition-all ease-in-out ${item.status ? "bg-green-400" : "bg-white"}`} onClick={() => handleStatusChange(item.id)} style={{
-                                                            padding: "1px"
-                                                        }}>
-                                                            <div className="w-full relative h-5">
-                                                                <div className={`border border-gray-300 h-5 w-5 rounded-full absolute transition-all ease-in-out ${item.status ? "right-0 bg-white" : "left-0 bg-gray-100"}`}>
-                                                                </div>
-                                                            </div>
-                                                        </button>
-                                                    </div>
-                                                </td>
+
                                                 <td className=" py-3 pr-3">
                                                     <div className="flex justify-center gap-3">
-                                                        
+
                                                         <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white"><Eye size={20} /></button>
                                                         <button className="p-2 cursor-pointer border border-gray-300 rounded-md hover:bg-white" onClick={() => {
                                                             setEditOpen(true)
@@ -282,7 +196,7 @@ const Inventory = () => {
             }
 
             {
-                isEditOpen && <EditProduct setEditOpen={setEditOpen} selectedProduct={selectedProduct} handleUpdate={handleUpdate} warning={warning} setWarning={setWarning} />
+                isEditOpen && <EditProduct setEditOpen={setEditOpen} selectedProduct={selectedProduct} handleUpdate={handleUpdate} category={category} />
             }
 
         </div>
@@ -293,33 +207,26 @@ interface EditProductPropsTypes {
     setEditOpen: React.Dispatch<React.SetStateAction<boolean>>,
     selectedProduct: productTypes,
     handleUpdate: (updatedData: productTypes) => void,
-    warning: warningType,
-    setWarning: React.Dispatch<React.SetStateAction<warningType>>
+    category: categoriesDataType[]
 }
 
-const EditProduct = ({ setEditOpen, selectedProduct, handleUpdate, warning, setWarning }: EditProductPropsTypes) => {
+const EditProduct = ({ setEditOpen, selectedProduct, handleUpdate, category }: EditProductPropsTypes) => {
     const [newData, setData] = useState<productTypes>(selectedProduct)
-    const handleChangeValues = (e: { target: { name: string; value: string } }) => {
-        const { name, value } = e.target
-        setData(prev => ({ ...prev, [name]: value }))
+    const handleChangeValues = (e: { target: { name: string; value: string; type: string } }) => {
+        const { name, value, type } = e.target
+        setData(prev => ({ ...prev, [name]: type === 'number'? Number(value): value }))
     }
+   
+
     return (
-        <div className="absolute top-0 left-0 z-60 w-full h-full min-h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
+        <div className="fixed top-0 left-0 z-60 w-full h-screen bg-[#c4c4c450] flex justify-center overflow-auto py-10">
             <div className="bg-white rounded-md p-4 min-w-70 max-w-50/100 w-full mt-20 lg:mt-45 h-fit">
                 <div className="w-full flex justify-between mb-4">
                     <div className="text-lg font-semibold">Edit Product</div>
                     <button className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 cursor-pointer" onClick={() => {
                         setEditOpen(false)
-                        setWarning({message: "", color: "", isOpen: false})
                     }}>Close</button>
                 </div>
-                {
-                    warning.isOpen && 
-                    <div className={`w-full px-3 py-1 my-2 border rounded-md flex justify-between ${warning.color}`}>
-                        <div>{warning.message}</div>
-                        <button className="cursor-pointer" onClick={()=>setWarning({message: "", color: "", isOpen: false})}><X size={20}/></button>
-                    </div>
-                }
                 <div className="space-y-4">
                     <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 space-y-2">
                         <div className="space-y-2">
@@ -331,9 +238,11 @@ const EditProduct = ({ setEditOpen, selectedProduct, handleUpdate, warning, setW
                             <div>
                                 <select name="category" id="" className="w-full border border-gray-300 rounded-md px-3 py-1.5" value={newData.category}
                                     onChange={handleChangeValues}>
-                                    <option value="Laptop" >Laptop</option>
-                                    <option value="GPU" >GPU</option>
-                                    <option value="Motherboard" >Motherboard</option>
+                                    {
+                                        category.map(item => (
+                                            <option key={item.id} value={item.categoryName}>{item.categoryName}</option>
+                                        ))
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -344,17 +253,23 @@ const EditProduct = ({ setEditOpen, selectedProduct, handleUpdate, warning, setW
                             <div><input type="number" name="price" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="e.g., 10000" value={newData.price} onChange={handleChangeValues} /></div>
                         </div>
                         <div className="space-y-2">
+                            <div>Original Price</div>
+                            <div><input type="number" name="originalPrice" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="e.g., 10" value={newData.originalPrice} onChange={handleChangeValues} /></div>
+                        </div>
+                    </div>
+                    <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 space-y-4">
+                        <div className="space-y-2">
                             <div>Stock</div>
                             <div><input type="number" name="stock" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="e.g., 10" value={newData.stock} onChange={handleChangeValues} /></div>
                         </div>
-                    </div>
-                    <div>
-                        <div>Featured</div>
-                        <div>
-                            <button className={`w-14 h-fit border rounded-full border-gray-300 flex cursor-pointer transition-all duration-100 ease-in-out ${newData.featured ? "bg-green-300 justify-end" : ""}`} style={{ padding: "1px" }} onClick={() => setData(prev => ({ ...prev, featured: !prev.featured }))}>
-                                <div className={`h-6 w-6 border border-gray-300 shadow top-0 rounded-full ${newData.featured ? "bg-white" : ""}`}></div>
-                            </button>
+                        <div className="space-y-2">
+                            <div>Featured</div>
+                            <div>
+                                <button className={`w-14 h-fit border rounded-full border-gray-300 flex cursor-pointer transition-all duration-100 ease-in-out ${newData.featured ? "bg-green-300 justify-end" : ""}`} style={{ padding: "1px" }} onClick={() => setData(prev => ({ ...prev, featured: !prev.featured }))}>
+                                    <div className={`h-6 w-6 border border-gray-300 shadow top-0 rounded-full ${newData.featured ? "bg-white" : ""}`}></div>
+                                </button>
 
+                            </div>
                         </div>
                     </div>
                 </div>
