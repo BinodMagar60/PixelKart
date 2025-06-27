@@ -109,7 +109,9 @@ export const deletecategory = async(route: string, data: {id: string}) => {
 
 export const getinventory = async(route: string) => {
   try {
-    const response = await axios.get(URI + route);
+    const response = await axios.get(URI + route, {
+      withCredentials: true
+    });
     return response.data
   } catch (error) {
     const err = error as AxiosError;
@@ -128,6 +130,31 @@ export const updateinventory = async(route: string, data: productTypes) => {
   }
 }
 
+
+export const deleteproduct = async(route: string, data: {id: string})=> {
+  try {
+    const response = await axios.delete(URI + route, {data: data})
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}
+
+
+//wishlist
+
+export const getWishlist = async(route: string) => {
+  try {
+    const response = await axios.get(URI + route, {
+      withCredentials: true
+    })
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}
 
 
 

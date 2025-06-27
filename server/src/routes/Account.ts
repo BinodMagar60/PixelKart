@@ -7,6 +7,7 @@ import z from "zod";
 import { log } from "console";
 import Category from "../models/Category";
 import { Product } from "../models/Product";
+import mongoose from "mongoose";
 
 const updatepasswordvalidation = z
   .object({
@@ -266,9 +267,12 @@ router.delete("/category", async (req, res) => {
 
 
 //inventory
-router.get("/inventory", async (req, res) => {
+router.get("/inventory", authHandler, async (req, res) => {
   try {
-    const allData = await Product.find();
+    const userdetail = (req as any).user
+    
+    if(userdetail.role !== 'User'){
+       const allData = await Product.find({role:{ $in: ['Admin','Worker']}}).sort({createdAt: -1});
     const safeData = allData.map(item =>({
       id: item._id,
       productName: item.productName,
@@ -277,10 +281,30 @@ router.get("/inventory", async (req, res) => {
       originalPrice: item.originalPrice,
       stock: item.qty,
       sales: 0,
-      featured: item.featured
+      featured: item.featured,
+      condition: item.condition,
     }))
 
     res.status(200).json({message: 'Data sent', safeData})
+    }
+    else{
+       const allData = await Product.find({poster: userdetail._id}).sort({createdAt: -1});
+    const safeData = allData.map(item =>({
+      id: item._id,
+      productName: item.productName,
+      category: item.category,
+      price: item.price,
+      originalPrice: item.originalPrice,
+      stock: item.qty,
+      sales: 0,
+      featured: item.featured,
+      condition: item.condition,
+    }))
+
+    res.status(200).json({message: 'Data sent', safeData})
+    }
+
+   
     
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -291,7 +315,7 @@ router.get("/inventory", async (req, res) => {
 
 router.put('/inventory', async(req, res) => {
   try {
-    const {id, productName, category, price, originalPrice, stock, featured} = req.body
+    const {id, productName, category, price, originalPrice, stock, featured, condition} = req.body
     const updatedData = await Product.findByIdAndUpdate(id,
       {
         productName: productName,
@@ -299,7 +323,8 @@ router.put('/inventory', async(req, res) => {
         price: price,
         originalPrice: originalPrice,
         qty: stock,
-        featured: featured
+        featured: featured,
+        condition: condition
       },
       {new: true}
     )
@@ -314,7 +339,44 @@ router.put('/inventory', async(req, res) => {
   }
 })
 
+router.delete('/inventory', async(req, res) => {
+  try {
+    const {id} = req.body
+    const deletedData = await Product.findByIdAndDelete(id)
+    if(!deletedData){
+      res.status(400).json({message: 'Product not found'})
+      return
+    }
+    res.status(200).json({message: "Product deleted", deletedData})
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
 
+
+//wishlist 
+
+router.get('/wishlist', authHandler, async(req, res)=> {
+  try {
+    const userdata = (req as any).user
+    const id:string = userdata._id
+    const wishlistProduct = await Product.find({userWishlist: id}).sort({createdAt: -1})
+    const safeData = await Promise.all(wishlistProduct.map( async(item) => {
+      const username = await User.findById(item.poster)
+      return {
+      id: item._id,
+      productName: item.productName,
+      photo: item.photo,
+      seller: username.firstName+ " " + username?.secondName,
+      price: item.price,
+    }
+    }))
+    
+    res.status(200).json({message: "Wishlist data", safeData: safeData})
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
 
 
 

@@ -21,7 +21,7 @@ const favourite = async(e: React.MouseEvent<HTMLButtonElement>) => {
   e.stopPropagation()
   try{
     const response = await favouriteUpdate('updatefavourite',{id: product.id})
-    // console.log(response)
+    
     if(response.status === 400 || response.status === 500){
       toast.error(response.data.message, {
         autoClose: 1000,

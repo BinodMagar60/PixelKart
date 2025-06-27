@@ -39,6 +39,7 @@ export type productDataType = z.infer<typeof productDataValidation>
 
 interface propsType {
     setAddCardOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    setchange: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface conditoinsType {
@@ -48,7 +49,7 @@ interface conditoinsType {
     updatedAt: Date
 }
 
-const AddProduct = ({ setAddCardOpen }: propsType) => {
+const AddProduct = ({ setAddCardOpen, setchange }: propsType) => {
     const { userInfo } = useUserContext()
     const [conditionOpen, setConditionOpen] = useState(false)
     const [categoryOpen, setCategoryOpen] = useState(false)
@@ -210,6 +211,7 @@ const AddProduct = ({ setAddCardOpen }: propsType) => {
                     condition: selectedCondition,
                     qty: 0,
                 })
+                setchange(prev => !prev)
                 setAddCardOpen(false)
             }, 1500);
         } catch (err) {
