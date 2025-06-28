@@ -5,10 +5,8 @@ import { useParams } from "react-router-dom"
 import { useProductContext } from "../../context/ProductContext"
 import { useUserContext } from "../../context/UserContext"
 import DOMPurify from 'dompurify';
-import { favouriteUpdate } from "../../api/ProductAPI"
+import { addToCart, favouriteUpdate } from "../../api/ProductAPI"
 import { toast } from "react-toastify"
-
-
 
 
 interface cardType {
@@ -18,11 +16,6 @@ interface cardType {
 }
 
 type productdetailTypes = "Description" | "Reviews" | "Shipping & Returns"
-
-
-
-
-
 
 const iconSize = 32
 const iconStrokeWidth = 1.5
@@ -115,16 +108,13 @@ const ProductDetial = () => {
     }, [products, productId])
 
 
-
-
     const productImages = product?.photo;
-
-
 
     const [productDetails, setProductDetails] = useState<productdetailTypes>("Description")
     const [productRating, setProductRating] = useState<number>(0)
     const [productStarRating, setProductStarRating] = useState<number>(0)
     const [selectedImg, setSelectedImg] = useState(1)
+    const [qty, setQty] = useState(1)
 
 
 
@@ -172,27 +162,56 @@ const ProductDetial = () => {
     }, [product])
 
 
-    
-    const favourite = async() => {
-      try{
-        const response = await favouriteUpdate('updatefavourite',{id: productId})
-        // console.log(response)
-        if(response.status === 400 || response.status === 500){
-          toast.error(response.data.message, {
-            autoClose: 1000,
-            theme: 'light'
-          })
-          return
+
+    const favourite = async () => {
+        try {
+            const response = await favouriteUpdate('updatefavourite', { id: productId })
+            
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+
+            if (productId && userInfo) {
+                updateproductwishlist(productId, userInfo._id)
+            }
         }
-    
-        if(productId && userInfo ){
-            updateproductwishlist(productId, userInfo._id)
+        catch (error) {
+            console.log(error)
         }
-      }
-      catch(error){
-        console.log(error)
-      }
-      
+
+    }
+
+    const handleAddtoCart = async () => {
+        try {
+            const newData = {
+                productId: productId ?? "",
+            }
+
+            const response = await addToCart('cart', newData)
+            if(response.status === 400 || response.status === 500){
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+            if(response.status === 401){
+                toast.info(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+            }
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: 'light'
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
 
@@ -257,7 +276,7 @@ const ProductDetial = () => {
                                     </div>
                                 </div>
                                 <div className="w-full space-y-3">
-                                    <div className={`bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl ${product.qty === 0 ? "bg-red-500":""}`}>{product.qty > 0 ? product?.condition : "Out of stock"}</div>
+                                    <div className={`bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl ${product.qty === 0 ? "bg-red-500" : ""}`}>{product.qty > 0 ? product?.condition : "Out of stock"}</div>
                                     <div className="text-4xl font-bold">{product?.productName}</div>
                                     <div className="flex gap-4">
                                         <span className="flex items-center gap-2"><span><Star color="orange" fill="orange" size={20} /></span> <span className="font-semibold">4.8</span> <span className="text-gray-600">(124 reviews)</span></span>
@@ -274,33 +293,46 @@ const ProductDetial = () => {
                                             )
                                         }
                                     </div>
-                                    <div className="text-green-600 font-semibold text-md">Free shipping</div>
+                                    <div className="text-green-600 font-semibold text-md">{product.price < 1500 ? "" : "Free Shipping"}</div>
                                     <div className="text-md mt-6">
-                                        <span className="">Quantity: </span>
+                                        <span>Quantity: </span>
                                         <span>
-                                            <select name="" id="" className="border bg-white px-2 py-0.5 border-gray-300 rounded-sm mx-2">
-
-                                                {Array.from({ length: product.qty > 5 ? 5 : product?.qty }, (_, i) => (
-                                                    <option key={i + 1} value={i + 1}>
-                                                        {i + 1}
-                                                    </option>
-                                                ))}
+                                            <select
+                                                className="border bg-white px-2 py-0.5 border-gray-300 rounded-sm mx-2"
+                                                value={qty}
+                                                onChange={(e) => setQty(Number(e.target.value))}
+                                            >
+                                                {Array.from(
+                                                    { length: product?.qty > 5 ? 5 : product?.qty || 0 },
+                                                    (_, i) => (
+                                                        <option key={i + 1} value={i + 1}>
+                                                            {i + 1}
+                                                        </option>
+                                                    )
+                                                )}
                                             </select>
                                             <span className="text-gray-600 text-sm">({product?.qty} available)</span>
                                         </span>
                                     </div>
-                                    <div className="flex w-full gap-2 items-center">
-                                        <button className=" border w-full bg-black text-white font-semibold flex p-2 justify-center items-center rounded-md cursor-pointer gap-2 hover:bg-gray-800">
-                                            <span><ShoppingCart size={18} /></span>
-                                            <span>Add to Cart</span>
-                                        </button>
-                                        <button className=" border border-gray-300 w-full bg-white text-black font-semibold p-2 rounded-md cursor-pointer hover:bg-gray-200">Buy Now</button>
-                                        {
-                                            userInfo?.role === 'User' && (
-                                                <button className="border p-2.5 rounded-md cursor-pointer border-gray-300 bg-white hover:bg-gray-200 transition-all ease-in-out" onClick={() => favourite()}><Heart size={20} color={product.userWishlist.includes(userInfo?._id)? "red" : "black"} fill={product.userWishlist.includes(userInfo?._id)? "red" : "white"} /></button>
-                                            )
-                                        }
-                                    </div>
+
+
+                                    {/* this is the add to cart section */}
+                                    {
+                                        userInfo?.role === "User" && product.qty > 0 && (
+                                            <div className="flex w-full gap-2 items-center">
+                                                <button className=" border w-full bg-black text-white font-semibold flex p-2 justify-center items-center rounded-md cursor-pointer gap-2 hover:bg-gray-800" onClick={handleAddtoCart}>
+                                                    <span><ShoppingCart size={18} /></span>
+                                                    <span>Add to Cart</span>
+                                                </button>
+                                                <button className=" border border-gray-300 w-full bg-white text-black font-semibold p-2 rounded-md cursor-pointer hover:bg-gray-200">Buy Now</button>
+                                                {
+                                                    userInfo?.role === 'User' && (
+                                                        <button className="border p-2.5 rounded-md cursor-pointer border-gray-300 bg-white hover:bg-gray-200 transition-all ease-in-out" onClick={() => favourite()}><Heart size={20} color={product.userWishlist.includes(userInfo?._id) ? "red" : "black"} fill={product.userWishlist.includes(userInfo?._id) ? "red" : "white"} /></button>
+                                                    )
+                                                }
+                                            </div>
+                                        )
+                                    }
                                     <div className="w-full border-t border-gray-300 my-4"></div>
                                     <div className="flex justify-evenly pt-5">
                                         {

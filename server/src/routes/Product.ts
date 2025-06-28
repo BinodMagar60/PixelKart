@@ -1,10 +1,12 @@
 import authHandler from "../middleware/auth";
 import Category from "../models/Category";
-import z, { object } from "zod";
-import { Router } from "express";
+import z, { object, promise } from "zod";
+import { response, Router } from "express";
 import { Product } from "../models/Product";
 import User from "../models/Users";
 import mongoose from "mongoose";
+import { getSystemErrorMessage } from "util";
+import { Order } from "../models/Order";
 
 interface PhotoData {
   id: number;
@@ -246,5 +248,99 @@ router.put("/updatefavourite", authHandler, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
+
+
+
+//cart
+router.post('/cart', authHandler, async(req, res)=> {
+  try {
+      const {productId, qty} = req.body
+      const userDetail = (req as any).user
+      const productDetail = await Product.findById(productId)
+      if(!productDetail){
+        res.status(400).json({message:"Product not found"})
+        return
+      }
+
+      const sellerDetail = await User.findOne({_id: productDetail.poster})
+      if(!sellerDetail){
+        res.status(400).json("User not found. Please relogin")
+      }
+      const newdata = new Order({
+        orderNumber: "",
+        productId: productDetail._id,
+        orderQty: 1,
+        shippingAddress: "",
+        shippingZipcode: "",
+        shippingMethod: "Standard Shipping",
+        trackingNumber: "",
+        status: "Cart",
+        deliverCharge: productDetail.price < 1500? 150 : 0,
+        sellerId: sellerDetail._id,
+        buyerId: userDetail._id,
+        buyerContact: 0,
+        isReviewed: false,
+        orderData: null
+      })
+
+      if(newdata.buyerId === newdata.sellerId){
+        res.status(400).json({message: "Seller cannot buy their own item"})
+        return
+      }
+
+      const inCart = await Order.findOne({productId: newdata.productId, buyerId: newdata.buyerId, status: "Cart"})
+      if(inCart){
+        res.status(401).json({message: "The item is already on your cart"})
+        return
+      }
+      const finalData = await newdata.save()
+      res.status(200).json({message: "Product added to cart", finalData})
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
+
+
+router.get('/cart', authHandler, async(req, res) => {
+  try {
+    const userDetails = (req as any).user
+    const cartItems = await Order.find({buyerId: userDetails._id})
+
+    const safeData = await Promise.all(cartItems.map(async(item)=> {
+      const productDetail = await Product.findById(item.productId)
+      const sellerDetail = await User.findOne({_id: productDetail?.poster})
+      
+      return {
+        id: item._id,
+        orderNumber: item.orderNumber,
+        productId: item.productId,
+        productName: productDetail?.productName,
+        productQTY: productDetail?.qty,
+        photo: productDetail?.photo[0],
+        price: productDetail?.price,
+        orderQty: item.orderQty,
+        shippingAddress: item.shippingAddress,
+        shippingZipcode: item.shippingZipcode,
+        shippingMethod: item.shippingMethod,
+        trackingNumber: item.trackingNumber,
+        status: item.status,
+        deliveryCharge: item.deliverCharge,
+        sellerName: sellerDetail.role === "User"? sellerDetail.firstName+" "+sellerDetail?.secondName: "PixelKart",
+        sellerId: sellerDetail._id,
+        buyerName: userDetails.firstName + " " + userDetails?.secondName,
+        buyerId: userDetails._id,
+        buyerContact: item.buyerContact,
+        isReviewed: item.isReviewed,
+        orderData: item.orderData,
+      }
+    }))
+
+    res.status(200).json({message: "Cart items received", data: safeData})
+  } catch (error) {
+    
+  }
+})
+
 
 export default router;

@@ -147,7 +147,7 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                 link: "/account/mylisting",
             },
             {
-                name: "Orders",
+                name: "Orders Request",
                 icon: <Package />,
                 link: "/account/order",
             },

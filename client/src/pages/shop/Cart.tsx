@@ -1,66 +1,65 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Navbar from "../../components/Navbar"
-import { Eye, ShoppingCart, Trash2 } from "lucide-react"
+import { Eye, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
+import { getCart } from "../../api/ProductAPI";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+export interface OrderItemType {
+    id: string,
+    orderNumber: string;
+    productId: string;
+    productName: string;
+    productQTY: number,
+    photo: string,
+    price: number,
+    orderQty: number;
+    shippingAddress: string;
+    shippingZipcode: string;
+    shippingMethod: string;
+    trackingNumber: string;
+    status:
+    "Cart"
+    | "Ordered"
+    | "Processing"
+    | "Shipped"
+    | "Delivered"
+    | "Cancelled";
+    deliverCharge: number;
+    sellerName: string;
+    sellerId: string;
+    buyerName: string;
+    buyerId: string;
+    buyerContact: number;
+    isReviewed: boolean;
+    orderData: Date | null;
+}
+
+
+
 
 const Cart = () => {
-
-    const [cartItems, setCartItems] = useState([
-         {
-            id: 1,
-            productName: "Gaming Laptop",
-            seller: "Binod",
-            OrderedDate: "20 Jun, 2020",
-            price: 12000,
-            status: "Order Placed",
-            shippingAddress: "123 Main st, city, akdf",
-            orderNo: "#ORD123",
-            qty: 2,
-            trackingNo: "123123123456456456789789",
-            photo: "/carousel/gpu.png",
-            isProductAvailable: true,
-        },
-        {
-            id: 2,
-            productName: "Gaming Laptop",
-            seller: "Binod",
-            OrderedDate: "20 Jun, 2020",
-            price: 12000,
-            status: "Delivered",
-            shippingAddress: "123 Main st, city, akdf",
-            orderNo: "#ORD123",
-            qty: 1,
-            trackingNo: "123123123456456456789789",
-            photo: "/carousel/gpu.png",
-            isProductAvailable: false,
-        },
-        {
-            id: 3,
-            productName: "Gaming Laptop",
-            seller: "Binod",
-            OrderedDate: "20 Jun, 2020",
-            price: 12000,
-            status: "Shipping",
-            shippingAddress: "123 Main st, city, akdf",
-            orderNo: "#ORD123",
-            qty: 1,
-            trackingNo: "123123123456456456789789",
-            photo: "/carousel/gpu.png",
-            isProductAvailable: true,
-        },
-        {
-            id: 4,
-            productName: "Gaming Laptop",
-            seller: "Binod",
-            OrderedDate: "20 Jun, 2020",
-            price: 12000,
-            status: "Cancelled",
-            shippingAddress: "123 Main st, city, akdf",
-            orderNo: "#ORD123",
-            qty: 1,
-            trackingNo: "123123123456456456789789",
-            photo: "/carousel/gpu.png",
-            isProductAvailable: true,
-        },])
+    const [change, setChange] = useState(false)
+    const [cartItems, setCartItems] = useState<OrderItemType[]>([])
+    const navigate = useNavigate()
+    useEffect(() => {
+        const apicall = async () => {
+            try {
+                const response = await getCart('cart')
+                if (response.status === 400 || response.status === 500) {
+                    toast.error(response.data.message, {
+                        autoClose: 1000,
+                        theme: 'light'
+                    })
+                    return
+                }
+                setCartItems(response.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        apicall()
+    }, [change])
 
 
 
@@ -74,32 +73,47 @@ const Cart = () => {
                             <div className="text-black font-semibold text-xl mb-8">Shopping cart ({cartItems.length} items)</div>
                             {
                                 cartItems.length !== 0 ? (
-                                <div className='space-y-2'>
-                            {
-                                cartItems.map(item => (
-                                    <div key={item.id} className="flex justify-between border border-gray-300 rounded-md p-3">
+                                    <div className='space-y-2'>
+                                        {
+                                            cartItems.map(item => (
+                                                <div key={item.id} className="flex justify-between border border-gray-300 rounded-md p-3">
 
-                                        <div className="flex gap-2">
-                                            <div className="h-18 w-18"><img src={item.photo} alt={item.productName} className="w-full h-full object-cover rounded-md border border-gray-300 shadow-sm" /></div>
-                                            <div>
-                                                <div className="text-lg font-semibold">{item.productName}</div>
-                                                <div className="text-sm text-gray-600">by {item.seller}</div>
-                                                <div className="text-sm text-gray-600">Rs {item.price}</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-3 items-center">
-                                            <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-200 cursor-pointer shadow-sm"><Eye strokeWidth={1.2} /></button>
-                                            <button className="p-2 border border-red-300 text-white bg-red-600 rounded-md hover:bg-red-700 cursor-pointer shadow-sm"><Trash2 strokeWidth={1.2} /></button>
-                                        </div>
-                                    </div>
-                                ))
-                            }
+                                                    <div className="flex gap-2">
+                                                        <div className="h-18 w-18"><img src={item.photo} alt={item.productName} className="w-full h-full object-cover rounded-md border border-gray-300 shadow-sm" /></div>
+                                                        <div>
+                                                            <div className="text-lg font-semibold">{item.productName}</div>
+                                                            <div className="text-sm text-gray-600">by {item.sellerName}</div>
+                                                            <div className="text-sm text-gray-600">Rs {item.price}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-3 items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            {
+                                                                item.productQTY > 0? <>
+                                                                    <div className="flex gap-4">
+                                                                        <button className="border border-gray-300 rounded-md p-1 cursor-pointer"><Plus size={16} /></button>
+                                                                        <div>{item.orderQty}</div>
+                                                                        <button className="border border-gray-300 rounded-md p-1 cursor-pointer"><Minus size={16} /></button>
+                                                                    </div>
+                                                                    <div className="text-xs text-gray-600 text-center">{item.productQTY} Available</div>
+                                                                </> : 
+                                                                <div className="text-red-500 text-xs">
+                                                                    Out of Stock
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-200 cursor-pointer shadow-sm" onClick={() => { navigate(`/product/${item.productId}`) }}><Eye strokeWidth={1.2} /></button>
+                                                        <button className="p-2 border border-red-300 text-white bg-red-600 rounded-md hover:bg-red-700 cursor-pointer shadow-sm"><Trash2 strokeWidth={1.5} /></button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
 
-                        </div>) : (<div className="w-full min-h-64 bg-gray-100 rounded-md flex flex-col gap-2 items-center justify-center text-gray-600">
-                                    <div><ShoppingCart size={42} strokeWidth={1.5}/></div>
-                                    <div className="text-xl font-semibold">No Cart Items</div>
-                                    <div><button className="px-3 py-1 text-white bg-black cursor-pointer hover:bg-gray-800 rounded-md">Browse Products</button></div>
-                                </div>)
+                                    </div>) : (<div className="w-full min-h-64 bg-gray-100 rounded-md flex flex-col gap-2 items-center justify-center text-gray-600">
+                                        <div><ShoppingCart size={42} strokeWidth={1.5} /></div>
+                                        <div className="text-xl font-semibold">No Cart Items</div>
+                                        <div><button className="px-3 py-1 text-white bg-black cursor-pointer hover:bg-gray-800 rounded-md">Browse Products</button></div>
+                                    </div>)
                             }
                         </div>
                     </div>

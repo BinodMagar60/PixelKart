@@ -47,7 +47,11 @@ const favourite = async(e: React.MouseEvent<HTMLButtonElement>) => {
         <div className="flex gap-1 items-center text-sm"><span className="text-yellow-400 fill-yellow-400 "><StarIcon size={16} fill="yellow-400"/></span> 4.8 (123)</div>
         <div className="text-gray-600 text-xs">By {product.poster}</div>
         <div className="flex justify-between items-center">
-          <div className="flex gap-2 font-semibold"><span >Rs.{product.price}</span><span className="text-xs text-gray-600 line-through">Rs.{product.originalPrice}</span></div>
+          <div className="flex gap-2 font-semibold"><span >Rs.{product.price}</span>
+          {
+            product.originalPrice > product.price && <span className="text-xs text-gray-600 line-through">Rs.{product.originalPrice}</span>
+          }
+          </div>
           {
             userInfo && userInfo.role === "User" && (
               <button className={`border-1 border-gray-300 p-2 rounded-md cursor-pointer transition-all ease-in duration-400 bg-white` } onClick={favourite} ><Heart size={16} stroke={product.userWishlist.includes(userInfo?._id)? "red":"black"} fill={product.userWishlist.includes(userInfo?._id)? "red":"white"}/></button>

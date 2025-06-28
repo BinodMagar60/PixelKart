@@ -23,7 +23,7 @@ const InitialLoading: React.FC<InitialLoadingProps> = ({ onLoadingComplete }) =>
       <div className="text-center max-w-md w-full">
 
         <div className="mb-12">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">ShopZone</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">PixelKart</h1>
           <p className="text-gray-500 text-sm">Your shopping destination</p>
         </div>
 

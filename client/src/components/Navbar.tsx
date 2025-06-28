@@ -149,13 +149,11 @@ const Navbar = () => {
                     {
                         !isSearchOpen && (
                             <div className="flex items-center lg:hidden ">
-                                <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 shadow-sm z-50" onClick={() => setIsSearchOpen(true)}><Search strokeWidth={1} /></button>
+                                <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 border border-gray-300 z-50" onClick={() => setIsSearchOpen(true)}><Search strokeWidth={1.5} /></button>
                             </div>
                         )
                     }
-                    <div>
-                        <button></button>
-                    </div>
+                    
                     {
                         !userInfo && (
                             <>
@@ -177,7 +175,7 @@ const Navbar = () => {
                         userInfo && (
                             <>
                                 <div>
-                                    <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 shadow-sm z-50"><ShoppingCart strokeWidth={1} /></button>
+                                    <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 border border-gray-300 z-50" onClick={()=> {navigate('/cart')}}><ShoppingCart strokeWidth={1.5} /></button>
                                 </div>
                                 <div className="relative" ref={dropdownRef}>
                                     <button className="rounded-sm px-3 py-1.5 cursor-pointer flex gap-2 items-center hover:bg-gray-100" onClick={Profile}><User size={20} strokeWidth={2} />{userInfo.firstName}</button>

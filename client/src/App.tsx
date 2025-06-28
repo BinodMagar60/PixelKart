@@ -24,6 +24,8 @@ import Analytics from "./pages/admin/Analytics"
 import Categories from "./pages/admin/Categories"
 import Workers from "./pages/admin/Workers"
 import Overview from "./pages/admin/Overview"
+import Cart from "./pages/shop/Cart"
+import Checkout from "./pages/shop/Checkout"
 
 
 const router = createBrowserRouter([
@@ -125,6 +127,21 @@ const router = createBrowserRouter([
       }
     ]
   },
+  {
+    path: "/cart",
+    element: <ProtectedRoute />,
+    errorElement: <Error />,
+    children: [
+      {
+        path: "",
+        element: <Cart />,
+      },
+      {
+        path: 'checkout',
+        element: <Checkout/>
+      }
+    ]
+  }
 
 ])
 

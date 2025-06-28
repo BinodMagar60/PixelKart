@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, {  AxiosError } from "axios";
 import z from "zod"
 const URI = import.meta.env.VITE_API_URL
 const URL = URI + "product/"
@@ -82,6 +82,34 @@ export const favouriteUpdate = async(route: string, data:unknown) => {
         return err?.response
     }
 }
+
+
+
+//cart items
+export const getCart = async(route: string) => {
+    try {
+        const response = await axios.get(URL + route, {
+            withCredentials: true
+        })
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        return err?.response
+    }
+}
+
+export const addToCart = async(route: string, data: { productId: string}) => {
+    try {
+        const response = await axios.post(URL+route, data, {
+            withCredentials: true
+        })
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        return err?.response
+    }
+}
+
 
 
 

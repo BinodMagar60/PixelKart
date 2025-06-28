@@ -1,6 +1,5 @@
 import { useState } from "react"
 import Navbar from "../../components/Navbar"
-import { Eye, Trash2 } from "lucide-react"
 
 const Checkout = () => {
 
@@ -120,16 +119,7 @@ const Checkout = () => {
                         <div className="w-full bg-white px-4 py-6 shadow-sm rounded-md">
                             <div className="text-black font-semibold text-xl mb-4">Shipping Information</div>
                             <div className="space-y-2">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="space-y-2">
-                                        <div>First Name</div>
-                                        <div><input type="text" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="Binod" /></div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div>Last Name</div>
-                                        <div><input type="text" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="Magar" /></div>
-                                    </div>
-                                </div>
+                                
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div className="space-y-2">
                                         <div>Address</div>
@@ -140,16 +130,7 @@ const Checkout = () => {
                                         <div><input type="number" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="Binod" /></div>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="space-y-2">
-                                        <div>First Name</div>
-                                        <div><input type="text" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="Binod" /></div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div>First Name</div>
-                                        <div><input type="text" className="w-full border border-gray-300 rounded-md px-3 py-1.5" placeholder="Binod" /></div>
-                                    </div>
-                                </div>
+                                
                             </div>
                         </div>
                         <div className="w-full bg-white px-4 py-6 shadow-sm rounded-md">
