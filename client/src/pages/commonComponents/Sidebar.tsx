@@ -1,6 +1,6 @@
 import { FolderTreeIcon, Heart, Home, LineChart, Menu, Package, Settings, ShoppingBag, ShoppingCart, Store, User, Users } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 
 
@@ -38,6 +38,8 @@ type roleType = "User" | "Admin" | "Worker"
 
 
 const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
+    const location = useLocation();
+
     const {userInfo} = useUserContext()
     const [sidebar, setSidebar] = useState<sidebarTYpes[] | null>(null)
     // console.log(userInfo)
@@ -180,11 +182,13 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
     const matchedItem = currentSidebar.find(item =>
         location.pathname.startsWith(item.link)
     );
+
     if (matchedItem) {
         setActiveSidebar(matchedItem.name);
         setTitle(matchedItem.name);
     }
 }, [role, location.pathname, setTitle]);
+
 
 
     return (

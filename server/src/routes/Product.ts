@@ -7,6 +7,7 @@ import User from "../models/Users";
 import mongoose from "mongoose";
 import { getSystemErrorMessage } from "util";
 import { Order } from "../models/Order";
+import { generateOrderId, generateRandomAlphanumericString } from "../utils/RandomOrderGenerator";
 
 interface PhotoData {
   id: number;
@@ -32,6 +33,38 @@ interface ProductResponse {
   createdAt: Date;
   userWishlist: mongoose.Types.ObjectId[]
 }
+
+export interface OrderItemT {
+    id: string,
+    orderNumber: string;
+    productId: string;
+    productName: string;
+    productQTY: number,
+    photo: string,
+    price: number,
+    orderQty: number;
+    shippingAddress: string;
+    shippingZipcode: string;
+    shippingMethod: string;
+    trackingNumber: string;
+    status:
+    "Cart"
+    | "Ordered"
+    | "Processing"
+    | "Shipped"
+    | "Delivered"
+    | "Cancelled";
+    deliveryCharge: number;
+    sellerName: string;
+    sellerId: string;
+    buyerName: string;
+    buyerId: string;
+    buyerContact: number;
+    isReviewed: boolean;
+    orderData: Date | null;
+}
+
+
 
 
 
@@ -271,6 +304,7 @@ router.post('/cart', authHandler, async(req, res)=> {
         orderNumber: "",
         productId: productDetail._id,
         orderQty: 1,
+        price: productDetail.price,
         shippingAddress: "",
         shippingZipcode: "",
         shippingMethod: "Standard Shipping",
@@ -305,7 +339,7 @@ router.post('/cart', authHandler, async(req, res)=> {
 router.get('/cart', authHandler, async(req, res) => {
   try {
     const userDetails = (req as any).user
-    const cartItems = await Order.find({buyerId: userDetails._id})
+    const cartItems = await Order.find({buyerId: userDetails._id, status: "Cart"})
 
     const safeData = await Promise.all(cartItems.map(async(item)=> {
       const productDetail = await Product.findById(item.productId)
@@ -325,7 +359,7 @@ router.get('/cart', authHandler, async(req, res) => {
         shippingMethod: item.shippingMethod,
         trackingNumber: item.trackingNumber,
         status: item.status,
-        deliveryCharge: item.deliverCharge,
+        deliveryCharge: productDetail?.price! < 1500? 150 : 0,
         sellerName: sellerDetail.role === "User"? sellerDetail.firstName+" "+sellerDetail?.secondName: "PixelKart",
         sellerId: sellerDetail._id,
         buyerName: userDetails.firstName + " " + userDetails?.secondName,
@@ -338,9 +372,91 @@ router.get('/cart', authHandler, async(req, res) => {
 
     res.status(200).json({message: "Cart items received", data: safeData})
   } catch (error) {
-    
+    res.status(500).json({message: "Server error", error})
   }
 })
+
+
+
+router.delete('/cart', async(req, res)=> {
+  try {
+    const {id} = req.body
+    const existingOrder = await Order.findByIdAndDelete(id)
+    if(!existingOrder){
+      res.status(400).json({message: 'Cart item not found. Please reload the page'})
+      return
+    }
+    res.status(200).json({message: "Cart item removed"})
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
+
+
+
+router.put('/placeorder', authHandler, async(req, res) => {
+  try {
+    const data: OrderItemT[] = req.body
+    const userData = (req as any).user
+
+    const newData = await Promise.all(data.map(async(item)=> {
+      const productExist = await Product.findOne({_id: item.productId})
+      if(!productExist){
+        res.status(400).json({message: "One or more product might not be available"})
+        return
+      }
+      if( item.orderQty > productExist.qty ){
+        res.status(400).json({message: "The product quantity is greater than available product"})
+        return
+      }
+      return {
+        ...item,
+        orderQty: item.orderQty,
+        deliveryCharge: item.deliveryCharge,
+        shippingAddress: item.shippingAddress,
+        shippingZipcode: item.shippingZipcode,
+        orderNumber: generateOrderId(),
+        trackingNumber: generateRandomAlphanumericString(),
+        status: "Ordered",
+        orderData: new Date(),
+        buyerContact: item.buyerContact,
+      }
+    }))
+
+
+    const SavedData = await Promise.all(newData.map(async(item)=> {
+      const productDetail = await Product.findOne({_id: item?.productId})
+      const newQty = productDetail?.qty! - item?.orderQty!
+      const productupdate = await Product.findOneAndUpdate({_id: item?.productId},
+        {
+          qty: newQty,
+        },
+        {
+          new: true
+        }
+      )
+      const data = await Order.findOneAndUpdate({_id: item?.id}, 
+        {
+          orderQty: item?.orderQty,
+          deliverCharge: item?.deliveryCharge,
+          shippingAddress: item?.shippingAddress,
+          shippingZipcode: item?.shippingZipcode,
+          orderNumber: item?.orderNumber,
+          trackingNumber: item?.trackingNumber,
+          status: item?.status,
+          orderData: item?.orderData,
+          buyerContact: item?.buyerContact,
+        }, {new: true})
+        return data
+    }))
+
+    res.status(200).json({message: "Order Placed"})
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
+
+
 
 
 export default router;

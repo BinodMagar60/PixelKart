@@ -136,7 +136,10 @@ const Navbar = () => {
     }, [userInfo]);
 
 
-
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        navigate(`/product/?q=`)
+    }
 
     return (
         <div className="w-full sticky top-0 px-10 sm:px-15 xl:px-30 bg-white z-30">
@@ -144,7 +147,7 @@ const Navbar = () => {
                 <Link to={'/'}>
                     <div className="flex h-full items-center gap-1 min-w-12"><img src="/logo.png" alt="PixelKart" className="h-10 w-10" /><span className="text-3xl font-bold hidden xl:block">PixelKart</span></div>
                 </Link>
-                <div className="f-full max-w-150 w-full relative hidden lg:block"><span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]"><Search size={16} /></span><input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 drop-shadow-sm rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" /></div>
+                <form  className="f-full max-w-150 w-full relative hidden lg:block"><span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]"><Search size={16} /></span><input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 drop-shadow-sm rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" /></form>
                 <div className="flex gap-1 justify-end min-w-55 ">
                     {
                         !isSearchOpen && (
@@ -153,7 +156,7 @@ const Navbar = () => {
                             </div>
                         )
                     }
-                    
+
                     {
                         !userInfo && (
                             <>
@@ -174,9 +177,11 @@ const Navbar = () => {
                     {
                         userInfo && (
                             <>
-                                <div>
-                                    <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 border border-gray-300 z-50" onClick={()=> {navigate('/cart')}}><ShoppingCart strokeWidth={1.5} /></button>
-                                </div>
+                                {
+                                    userInfo.role === "User" && <div>
+                                        <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 border border-gray-300 z-50" onClick={() => { navigate('/cart') }}><ShoppingCart strokeWidth={1.5} /></button>
+                                    </div>
+                                }
                                 <div className="relative" ref={dropdownRef}>
                                     <button className="rounded-sm px-3 py-1.5 cursor-pointer flex gap-2 items-center hover:bg-gray-100" onClick={Profile}><User size={20} strokeWidth={2} />{userInfo.firstName}</button>
                                     {
@@ -188,16 +193,16 @@ const Navbar = () => {
                                                             return (
                                                                 <li key={index}>
                                                                     {
-                                                                        item.link? (
+                                                                        item.link ? (
                                                                             <Link to={`${item?.link}`}>
-                                                                        <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2 hover:bg-gray-100 transition text-sm ${item.style}`} onClick={item.action}>
-                                                                            <span>{item.icon}</span> <span>{item.name}</span>
-                                                                        </button>
-                                                                    </Link>
+                                                                                <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2 hover:bg-gray-100 transition text-sm ${item.style}`} onClick={item.action}>
+                                                                                    <span>{item.icon}</span> <span>{item.name}</span>
+                                                                                </button>
+                                                                            </Link>
                                                                         ) : (
                                                                             <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2 hover:bg-gray-100 transition text-sm ${item.style}`} onClick={item.action}>
-                                                                            <span>{item.icon}</span> <span>{item.name}</span>
-                                                                        </button>
+                                                                                <span>{item.icon}</span> <span>{item.name}</span>
+                                                                            </button>
                                                                         )
                                                                     }
                                                                 </li>)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 
 interface itemsToShow {
@@ -58,6 +59,7 @@ const items: itemsToShow[] = [
 const Carousel = () => {
 
     const [cardNo, setCardNo] = useState<1 | 2 | 3 | 4 | 5>(1)
+    const navigate = useNavigate()
 
     useEffect(()=> {
         const interval = setInterval(()=> {
@@ -80,9 +82,11 @@ const Carousel = () => {
                             }}>
                             <div className="flex justify-center items-center text-shadow-lg/30 w-full h-full bg-[#00000038]">
                                 <div className=" flex flex-col items-center justify-center">
-                                    <div className="text-white text-6xl font-bold">{item.name}</div>
+                                    <div className="text-white text-6xl font-bold" >{item.name}</div>
                                     <div className="text-white text-xl mt-5">{item.description}</div>
-                                    <div><button className="border-1 border-white text-black bg-[#e6e6e6] hover:text-white hover:bg-transparent transition-all px-3 py-2 text-xl font-bold rounded-sm hover: mt-5 cursor-pointer">{item.buttonDetail}</button></div>
+                                    <div><button className="border-1 border-white text-black bg-[#e6e6e6] hover:text-white hover:bg-transparent transition-all px-3 py-2 text-xl font-bold rounded-sm hover: mt-5 cursor-pointer" onClick={()=> {
+                                        navigate(`/product/?category=laptop`)
+                                    }} >{item.buttonDetail}</button></div>
                                 </div>  
                             </div>
                         </div>

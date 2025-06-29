@@ -27,5 +27,6 @@ export type ProductContextType = {
   setProductLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedProduct: ProductType,
   setSelectedProduct: React.Dispatch<React.SetStateAction<ProductType>>,
-  updateproductwishlist: (pid: string, uid: string)=> void
+  updateproductwishlist: (pid: string, uid: string)=> void,
+  setApiChange: React.Dispatch<React.SetStateAction<boolean>>
 };

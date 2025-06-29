@@ -26,6 +26,7 @@ import Workers from "./pages/admin/Workers"
 import Overview from "./pages/admin/Overview"
 import Cart from "./pages/shop/Cart"
 import Checkout from "./pages/shop/Checkout"
+import { OrderSuccessScreen } from "./loading/OrderLoading"
 
 
 const router = createBrowserRouter([
@@ -139,6 +140,10 @@ const router = createBrowserRouter([
       {
         path: 'checkout',
         element: <Checkout/>
+      },
+      {
+        path: 'success',
+        element: <OrderSuccessScreen/>
       }
     ]
   }

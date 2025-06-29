@@ -114,7 +114,7 @@ const ProductDetial = () => {
     const [productRating, setProductRating] = useState<number>(0)
     const [productStarRating, setProductStarRating] = useState<number>(0)
     const [selectedImg, setSelectedImg] = useState(1)
-    const [qty, setQty] = useState(1)
+
 
 
 
@@ -295,24 +295,8 @@ const ProductDetial = () => {
                                     </div>
                                     <div className="text-green-600 font-semibold text-md">{product.price < 1500 ? "" : "Free Shipping"}</div>
                                     <div className="text-md mt-6">
-                                        <span>Quantity: </span>
-                                        <span>
-                                            <select
-                                                className="border bg-white px-2 py-0.5 border-gray-300 rounded-sm mx-2"
-                                                value={qty}
-                                                onChange={(e) => setQty(Number(e.target.value))}
-                                            >
-                                                {Array.from(
-                                                    { length: product?.qty > 5 ? 5 : product?.qty || 0 },
-                                                    (_, i) => (
-                                                        <option key={i + 1} value={i + 1}>
-                                                            {i + 1}
-                                                        </option>
-                                                    )
-                                                )}
-                                            </select>
-                                            <span className="text-gray-600 text-sm">({product?.qty} available)</span>
-                                        </span>
+                                        <span>Quantity: {product?.qty} available</span>
+                                        
                                     </div>
 
 

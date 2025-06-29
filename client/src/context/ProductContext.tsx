@@ -12,7 +12,7 @@ const ProductContext = createContext<ProductContextType | null>(null)
 
 export const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   
-  
+  const [apiChange, setApiChange] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<ProductType>({
     id: "",
     poster: "",
@@ -53,7 +53,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
       }
     }
     apiCall()
-  },[])
+  },[apiChange])
 
 
 
@@ -75,7 +75,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
  
 
   return (
-    <ProductContext.Provider value={{ products, setProducts, productLoading, setProductLoading, selectedProduct, setSelectedProduct, updateproductwishlist }}>
+    <ProductContext.Provider value={{ products, setProducts, productLoading, setProductLoading, selectedProduct, setSelectedProduct, updateproductwishlist, setApiChange }}>
       {children}
     </ProductContext.Provider>
   )

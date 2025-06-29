@@ -8,6 +8,7 @@ import { log } from "console";
 import Category from "../models/Category";
 import { Product } from "../models/Product";
 import mongoose from "mongoose";
+import { Order } from "../models/Order";
 
 const updatepasswordvalidation = z
   .object({
@@ -244,12 +245,10 @@ router.delete("/category", async (req, res) => {
       category: category?.category,
     });
     if (isCategoryBeingUsed.length > 0) {
-      res
-        .status(400)
-        .json({
-          message:
-            "The category you are trying to delete is being used by products",
-        });
+      res.status(400).json({
+        message:
+          "The category you are trying to delete is being used by products",
+      });
       return;
     }
 
@@ -264,59 +263,65 @@ router.delete("/category", async (req, res) => {
   }
 });
 
-
-
 //inventory
 router.get("/inventory", authHandler, async (req, res) => {
   try {
-    const userdetail = (req as any).user
-    
-    if(userdetail.role !== 'User'){
-       const allData = await Product.find({role:{ $in: ['Admin','Worker']}}).sort({createdAt: -1});
-    const safeData = allData.map(item =>({
-      id: item._id,
-      productName: item.productName,
-      category: item.category,
-      price: item.price,
-      originalPrice: item.originalPrice,
-      stock: item.qty,
-      sales: 0,
-      featured: item.featured,
-      condition: item.condition,
-    }))
+    const userdetail = (req as any).user;
 
-    res.status(200).json({message: 'Data sent', safeData})
+    if (userdetail.role !== "User") {
+      const allData = await Product.find({
+        role: { $in: ["Admin", "Worker"] },
+      }).sort({ createdAt: -1 });
+      const safeData = allData.map((item) => ({
+        id: item._id,
+        productName: item.productName,
+        category: item.category,
+        price: item.price,
+        originalPrice: item.originalPrice,
+        stock: item.qty,
+        sales: 0,
+        featured: item.featured,
+        condition: item.condition,
+      }));
+
+      res.status(200).json({ message: "Data sent", safeData });
+    } else {
+      const allData = await Product.find({ poster: userdetail._id }).sort({
+        createdAt: -1,
+      });
+      const safeData = allData.map((item) => ({
+        id: item._id,
+        productName: item.productName,
+        category: item.category,
+        price: item.price,
+        originalPrice: item.originalPrice,
+        stock: item.qty,
+        sales: 0,
+        featured: item.featured,
+        condition: item.condition,
+      }));
+
+      res.status(200).json({ message: "Data sent", safeData });
     }
-    else{
-       const allData = await Product.find({poster: userdetail._id}).sort({createdAt: -1});
-    const safeData = allData.map(item =>({
-      id: item._id,
-      productName: item.productName,
-      category: item.category,
-      price: item.price,
-      originalPrice: item.originalPrice,
-      stock: item.qty,
-      sales: 0,
-      featured: item.featured,
-      condition: item.condition,
-    }))
-
-    res.status(200).json({message: 'Data sent', safeData})
-    }
-
-   
-    
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 });
 
-
-
-router.put('/inventory', async(req, res) => {
+router.put("/inventory", async (req, res) => {
   try {
-    const {id, productName, category, price, originalPrice, stock, featured, condition} = req.body
-    const updatedData = await Product.findByIdAndUpdate(id,
+    const {
+      id,
+      productName,
+      category,
+      price,
+      originalPrice,
+      stock,
+      featured,
+      condition,
+    } = req.body;
+    const updatedData = await Product.findByIdAndUpdate(
+      id,
       {
         productName: productName,
         category: category,
@@ -324,60 +329,105 @@ router.put('/inventory', async(req, res) => {
         originalPrice: originalPrice,
         qty: stock,
         featured: featured,
-        condition: condition
+        condition: condition,
       },
-      {new: true}
-    )
-    if(!updatedData){
-      res.status(400).json({message: 'Couldnt find the product'})
-      return
+      { new: true }
+    );
+    if (!updatedData) {
+      res.status(400).json({ message: "Couldnt find the product" });
+      return;
     }
-    res.status(200).json({message: 'Product updated', updatedData})
-
+    res.status(200).json({ message: "Product updated", updatedData });
   } catch (error) {
-    res.status(500).json({message:'Server error', error})
+    res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
-router.delete('/inventory', async(req, res) => {
+router.delete("/inventory", async (req, res) => {
   try {
-    const {id} = req.body
-    const deletedData = await Product.findByIdAndDelete(id)
-    if(!deletedData){
-      res.status(400).json({message: 'Product not found'})
-      return
+    const { id } = req.body;
+    const deletedData = await Product.findByIdAndDelete(id);
+    if (!deletedData) {
+      res.status(400).json({ message: "Product not found" });
+      return;
     }
-    res.status(200).json({message: "Product deleted", deletedData})
+    res.status(200).json({ message: "Product deleted", deletedData });
   } catch (error) {
-    res.status(500).json({message: "Server error", error})
+    res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
+//wishlist
 
-//wishlist 
-
-router.get('/wishlist', authHandler, async(req, res)=> {
+router.get("/wishlist", authHandler, async (req, res) => {
   try {
-    const userdata = (req as any).user
-    const id:string = userdata._id
-    const wishlistProduct = await Product.find({userWishlist: id}).sort({createdAt: -1})
-    const safeData = await Promise.all(wishlistProduct.map( async(item) => {
-      const username = await User.findById(item.poster)
-      return {
-      id: item._id,
-      productName: item.productName,
-      photo: item.photo,
-      seller: username.firstName+ " " + username?.secondName,
-      price: item.price,
-    }
-    }))
-    
-    res.status(200).json({message: "Wishlist data", safeData: safeData})
+    const userdata = (req as any).user;
+    const id: string = userdata._id;
+    const wishlistProduct = await Product.find({ userWishlist: id }).sort({
+      createdAt: -1,
+    });
+    const safeData = await Promise.all(
+      wishlistProduct.map(async (item) => {
+        const username = await User.findById(item.poster);
+        return {
+          id: item._id,
+          productName: item.productName,
+          photo: item.photo,
+          seller: username.firstName + " " + username?.secondName,
+          price: item.price,
+        };
+      })
+    );
+
+    res.status(200).json({ message: "Wishlist data", safeData: safeData });
   } catch (error) {
-    res.status(500).json({message: "Server error", error})
+    res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
+//mypurchase
+router.get("/mypurchase", authHandler, async (req, res) => {
+  try {
+    const userDetails = (req as any).user;
+    const cartItems = await Order.find({ buyerId: userDetails._id });
 
+    const safeData = await Promise.all(
+      cartItems.map(async (item) => {
+        const productDetail = await Product.findById(item.productId);
+        const sellerDetail = await User.findOne({ _id: productDetail?.poster });
+        if(item.status !== "Cart"){
+          return {
+          id: item._id,
+          orderNumber: item.orderNumber,
+          productId: item.productId,
+          productName: productDetail?.productName,
+          productQTY: productDetail?.qty,
+          photo: productDetail?.photo[0],
+          price: productDetail?.price,
+          orderQty: item.orderQty,
+          shippingAddress: item.shippingAddress,
+          shippingZipcode: item.shippingZipcode,
+          shippingMethod: item.shippingMethod,
+          trackingNumber: item.trackingNumber,
+          status: item.status,
+          deliveryCharge: productDetail?.price! < 1500 ? 150 : 0,
+          sellerName:
+            sellerDetail.role === "User"
+              ? sellerDetail.firstName + " " + sellerDetail?.secondName
+              : "PixelKart",
+          sellerId: sellerDetail._id,
+          buyerName: userDetails.firstName + " " + userDetails?.secondName,
+          buyerId: userDetails._id,
+          buyerContact: item.buyerContact,
+          isReviewed: item.isReviewed,
+          orderData: item.orderData,
+        };
+        }
+      })
+    );
+
+    res.status(200).json({ message: "Cart items received", data: safeData });
+  } catch (error) {}
+});
 
 export default router;

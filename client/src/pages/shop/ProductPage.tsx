@@ -2,12 +2,21 @@ import { useState } from "react"
 import FilterPanel from "../../components/FilterPanel"
 import Navbar from "../../components/Navbar"
 import Products from "../../components/Products"
+import { useSearchParams } from "react-router-dom"
 
 const ProductPage = () => {
   
+  const [searchParams] = useSearchParams()
+  const category = searchParams.get('category')
 
+  console.log(category)
   const [isFilterActive, setIsFilterActive] = useState<boolean>(false)
 
+  const [filterdata, setfilterdata] = useState({
+    category: "All",
+    condition: "All",
+    soriting: "Highest Rated"
+  })
 
   return (
     <div>

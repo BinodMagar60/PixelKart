@@ -5,6 +5,7 @@ export interface IOrder extends Document {
   orderNumber: string;
   productId: Types.ObjectId;
   orderQty: number;
+  price: number,
   shippingAddress: string;
   shippingZipcode: string;
   shippingMethod: string;
@@ -33,6 +34,7 @@ const OrderSchema = new Schema<IOrder>(
       required: true,
     },
     orderQty: { type: Number, required: true },
+    price: {type: Number, required: true},
     shippingAddress: { type: String, default: "" },
     shippingZipcode: { type: String, default: "" },
     shippingMethod: { type: String, default: "Standard Shipping" },

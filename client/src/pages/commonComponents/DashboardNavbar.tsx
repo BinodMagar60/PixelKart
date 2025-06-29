@@ -44,9 +44,11 @@ const DashboardNavbar = ({ menuButton, title }: SidebarProps) => {
       <div className={`font-semibold text-2xl transition-all ease-in-out duration-500 ${menuButton ? "sm:pl-5" : "sm:pl-15"}`}>{title}</div>
       <div className="relative" ref={dropdownRef}>
         <div className="flex items-center gap-3">
-          <div>
+          {
+            userInfo?.role === "User" && <div>
             <button className="rounded-sm px-2 py-1.5 cursor-pointer flex gap-2 h-full items-center hover:bg-gray-100 border border-gray-300 z-50" onClick={() => { navigate('/cart') }}><ShoppingCart strokeWidth={1.5} /></button>
           </div>
+          }
           <button
             className="h-11 w-11 flex items-center justify-center rounded-full shadow border-1 border-gray-300 cursor-pointer"
             onClick={() => setOpen(!isOpen)}

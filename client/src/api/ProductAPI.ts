@@ -1,5 +1,6 @@
 import axios, {  AxiosError } from "axios";
 import z from "zod"
+import type { OrderItemType } from "../pages/shop/Cart";
 const URI = import.meta.env.VITE_API_URL
 const URL = URI + "product/"
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET
@@ -111,8 +112,28 @@ export const addToCart = async(route: string, data: { productId: string}) => {
 }
 
 
+export const removeCart = async(route: string, data: {id: string}) => {
+    try {
+        const response = await axios.delete(URL + route, {data})
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        return err?.response
+    }
+}
 
 
+export const placeOrderAPI = async(route: string, data: OrderItemType[]) =>{
+    try {
+        const response = await axios.put(URL+route, data, {
+            withCredentials: true
+        })
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        return err?.response
+    }
+}
 
 
 

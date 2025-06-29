@@ -158,5 +158,18 @@ export const getWishlist = async(route: string) => {
 
 
 
+//mypurchases
+export const getMypurchase = async(route:string) => {
+  try {
+    const response = await axios.get(URI + route, {
+      withCredentials: true
+    })
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}
+
 
 

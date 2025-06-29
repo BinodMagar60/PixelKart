@@ -1,6 +1,7 @@
-import { useState, type SetStateAction } from "react";
+import { useEffect, useState, type SetStateAction } from "react";
 import '../index.css'
 import { Check, ChevronDown } from "lucide-react";
+import { getcategory } from "../api/AccountAPI";
 
 
 type propsTypes = {
@@ -11,16 +12,17 @@ type propsTypes = {
 
 const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
 
-    type categoryType = "All" | "Laptop" | "Desktop"
+    type categoryType = {
+        id: string,
+        categoryName: string,
+        Product: number,
+    }
 
     type conditionType = "All" | "Brand New" | "Like New" | "Used"
 
+    const [categoryes, setcategoryes] = useState<categoryType[]>([])
 
-    const categoryes: categoryType[] = [
-        "All",
-        "Laptop",
-        "Desktop"
-    ]
+    
 
     const conditions: conditionType[] = [
         "All",
@@ -32,11 +34,27 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
 
     const maxPrice = 2000;
     const [price, setPrice] = useState(maxPrice);
-    const [selectedCategory, setSelectedCategory] = useState<categoryType>("All")
+    const [selectedCategory, setSelectedCategory] = useState("All")
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [selectedCondition, setSelectedCondition] = useState<conditionType>("All")
     const [conditionOpen, setConditionOpen] = useState(false)
 
+    useEffect(()=> {
+        const apicall = async() => { 
+            try {
+                const response = await getcategory("account/category")
+                const newdata =[{
+                    id: 1,
+                    categoryName: "All",
+                    Product: 0,
+                }, ...response.safeData]
+                setcategoryes(newdata)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        apicall()
+    },[])
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value, 10);
         if (!isNaN(value) && value <= maxPrice && value >= 0) {
@@ -67,16 +85,16 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
                             <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
                                 {categoryes.map((option) => (
                                     <li
-                                        key={option}
+                                        key={option.id}
                                         onClick={() => {
-                                            setSelectedCategory(option);
+                                            setSelectedCategory(option.categoryName);
                                             setCategoryOpen(false);
                                         }}
                                         className="p-0.5"
                                     >
                                         <div className="flex gap-2 p-2 hover:bg-gray-200 rounded-sm cursor-pointer select-none">
-                                            <span>{selectedCategory === option ? <Check size={16} /> : <Check size={16} visibility={"hidden"} />}</span>
-                                            <span>{option}</span>
+                                            <span>{selectedCategory === option.categoryName ? <Check size={16} /> : <Check size={16} visibility={"hidden"} />}</span>
+                                            <span>{option.categoryName}</span>
                                         </div>
                                     </li>
                                 ))}
