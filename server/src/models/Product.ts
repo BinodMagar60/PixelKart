@@ -32,7 +32,7 @@ const ProductSchema = new Schema<IProduct>({
   photo: [{ type: String }],
   featured: {type: Boolean, default: false},
   views: {type: Number, default: 0},
-  userWishlist: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+  userWishlist: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
 },{
   timestamps: true
 });

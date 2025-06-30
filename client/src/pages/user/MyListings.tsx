@@ -7,6 +7,7 @@ import { toast } from "react-toastify"
 import type { categoriesDataType } from "../admin/Categories"
 import z from 'zod'
 import {  useNavigate } from "react-router-dom"
+import { useProductContext } from "../../context/ProductContext"
 
 const productValidation = z.object({
     id: z.string({ required_error: 'Product id error' }),
@@ -28,6 +29,7 @@ const productValidation = z.object({
 
 
 const MyListings = () => {
+    const {setApiChange} = useProductContext()
     const navigate = useNavigate();
     const [change, setchange] = useState(false)
     const [isAddCardOpen, setAddCardOpen] = useState(false)
@@ -110,6 +112,7 @@ const MyListings = () => {
                 theme: "light",
             });
             setchange(prev => !prev);
+            setApiChange(prev=> !prev)
 
         } catch (error) {
             console.log(error);

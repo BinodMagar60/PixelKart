@@ -172,4 +172,40 @@ export const getMypurchase = async(route:string) => {
 }
 
 
+export const cancelOrder = async(route: string, data: {orderId: string}) => {
+  try {
+  const response = await axios.put(URI + route, data, {
+      withCredentials: true
+    })
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}
 
+//Orders
+export const getOrdersAdmin = async(route: string) => {
+  try {
+    const response = await axios.get(URI + route, {
+      withCredentials: true
+    })
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}
+
+
+export const updateOrderStatus = async(route: string, data: {orderId: string}) => {
+  try {
+  const response = await axios.put(URI + route, data, {
+      withCredentials: true
+    })
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError
+    return err?.response
+  }
+}

@@ -79,6 +79,7 @@ const Checkout = () => {
             }
             setApiChange(prev => !prev)
             setOrderData([])
+            setApiChange(prev=> !prev)
             setTimeout(() => {
                 navigate('/cart/success')
             }, 4000);

@@ -6,7 +6,7 @@ import { toast } from "react-toastify"
 import z from 'zod'
 import type { categoriesDataType } from "./Categories"
 import { useNavigate } from "react-router-dom"
-
+import { useProductContext } from "../../context/ProductContext"
 
 export interface productTypes {
     id: string,
@@ -39,6 +39,7 @@ const productValidation = z.object({
     })
 
 const Inventory = () => {
+    const { setApiChange } = useProductContext()
     const navigate = useNavigate();
     const [change, setchange] = useState(false)
     const [isAddCardOpen, setAddCardOpen] = useState(false)
@@ -93,7 +94,6 @@ const Inventory = () => {
 
     const handleUpdate = async (Data: productTypes) => {
         try {
-            console.log(Data)
             const parsed = productValidation.safeParse(Data);
             if (!parsed.success) {
                 const errors = parsed.error.flatten().fieldErrors;
@@ -120,6 +120,7 @@ const Inventory = () => {
                 theme: "light",
             });
             setchange(prev => !prev);
+            setApiChange(prev => !prev)
 
         } catch (error) {
             console.log(error);
@@ -131,7 +132,7 @@ const Inventory = () => {
     }
 
 
-    const handleDelete = (item: productTypes) => {
+    const handleDelete = async(item: productTypes) => {
         setDeleteCardOpen(true)
         setSelectedProduct(item)
     }

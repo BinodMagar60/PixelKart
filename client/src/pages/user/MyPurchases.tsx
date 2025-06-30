@@ -1,11 +1,12 @@
 import { Eye } from "lucide-react"
 import { useEffect, useState } from "react"
 import { formatDateToReadable } from "../../utils/DateConverter"
-import { getMypurchase } from "../../api/AccountAPI";
-import { Navigate, useNavigate } from "react-router-dom";
+import { cancelOrder, getMypurchase } from "../../api/AccountAPI";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useProductContext } from "../../context/ProductContext";
 
-
-interface purchaseType {
+export interface purchaseType {
     id: string,
     orderNumber: string;
     productId: string;
@@ -40,7 +41,7 @@ interface purchaseType {
 
 
 const MyPurchases = () => {
-    
+    const {setApiChange} = useProductContext()
     const [openDetail, setOpenDetail] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<purchaseType>({
         id: "",
@@ -68,31 +69,50 @@ const MyPurchases = () => {
 
     const [orderData, setOrderData] = useState<purchaseType[]>([])
 
-    useEffect(()=> {
-        const apicall = async() => {
+    useEffect(() => {
+        const apicall = async () => {
             try {
                 const response = await getMypurchase('account/mypurchase')
+                // console.log(response.data)
                 setOrderData(response.data)
             } catch (error) {
                 console.log(error)
             }
         }
         apicall()
-    },[])
+    }, [])
 
 
 
 
-    const handleCancel = (id: string) => {
-        const newData:purchaseType[] = orderData.map(item => {
-            if (id === item.id) {
-                return { ...item, status: "Cancelled" }
+    const handleCancel = async (id: string) => {
+        try {
+            const response = await cancelOrder('account/ordercancel', {orderId: id})
+            if(response.status === 400 || response.status === 500){
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
             }
-            return item
-        })
-        setOrderData(newData)
-        if (selectedProduct.id === id) {
-            setSelectedProduct(prev => ({ ...prev, status: "Cancelled" }));
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: 'light'
+            })
+            const newData: purchaseType[] = orderData.map(item => {
+                if (id === item.id) {
+                    return { ...item, status: "Cancelled" }
+                }
+                return item
+            })
+            setOrderData(newData)
+            if (selectedProduct.id === id) {
+                setSelectedProduct(prev => ({ ...prev, status: "Cancelled" }));
+            }
+            setApiChange(prev => !prev)
+            
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -160,7 +180,7 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel }: MyOrderLi
                 <div className="flex justify-between items-start">
                     <div>
                         <div className="text-black font-semibold text-xl">{selectedProduct.orderNumber}</div>
-                        <div className="text-gray-600 text-sm">Placed on {selectedProduct.orderData}</div>
+                        <div className="text-gray-600 text-sm">Placed on {formatDateToReadable(selectedProduct.orderData)}</div>
                     </div>
                     <button className="px-3 py-2 hover:bg-gray-200 cursor-pointer w-fit h-fit border border-gray-300 rounded-md" onClick={() => setOpenDetail(false)}>Close</button>
                 </div>
@@ -174,7 +194,7 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel }: MyOrderLi
                     </div>
                     <div>
                         <div className="text-xl font-bold pr-2 text-right">Rs. {selectedProduct.price}</div>
-                        <div><button className="text-sm px-2 py-1 border border-black rounded-md bg-black text-white cursor-pointer hover:bg-gray-800" onClick={()=>{navigate(`/product/${selectedProduct.productId}`)}}>Visit Product</button></div>
+                        <div><button className="text-sm px-2 py-1 border border-black rounded-md bg-black text-white cursor-pointer hover:bg-gray-800" onClick={() => { navigate(`/product/${selectedProduct.productId}`) }}>Visit Product</button></div>
                     </div>
                 </div>
             </div>

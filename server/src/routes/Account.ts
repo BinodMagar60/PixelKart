@@ -130,22 +130,37 @@ router.get("/usermanagement", async (req, res) => {
     const allUsers = await User.find({ role: "User" }).select(
       "-password -updatedAt -__v"
     );
-    const safeUser = allUsers.map((item) => {
-      return {
-        id: item._id,
-        firstName: item.firstName,
-        lastName: item.secondName,
-        email: item.email,
-        joinedDate: item.createdAt,
-        orders: 10,
-        totalSpent: 12000,
-        address: item.Address,
-        phoneNumber: item.phone,
-        role: item.role,
-        gender: item.gender,
-        listedItems: 5,
-      };
-    });
+    const safeUser = await Promise.all(
+      allUsers.map(async (item) => {
+        const boughtOrders = await Order.find({ buyerId: item._id });
+        const soldOrders = await Product.find({ poster: item._id });
+
+        const validOrders = boughtOrders.filter((item) => {
+          if (!["Cart", "Cancelled"].includes(item.status)) {
+            return item
+          }
+        });
+
+        let totalMoneySpent = 0;
+        validOrders.forEach((order) => {
+          totalMoneySpent += order.price * order.orderQty;
+        });
+        return {
+          id: item._id,
+          firstName: item.firstName,
+          lastName: item.secondName,
+          email: item.email,
+          joinedDate: item.createdAt,
+          orders: validOrders.length,
+          totalSpent: totalMoneySpent,
+          address: item.Address,
+          phoneNumber: item.phone,
+          role: item.role,
+          gender: item.gender,
+          listedItems: soldOrders.length,
+        };
+      })
+    );
     res.status(200).json({ message: "All user data", data: safeUser });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
@@ -346,12 +361,21 @@ router.put("/inventory", async (req, res) => {
 router.delete("/inventory", async (req, res) => {
   try {
     const { id } = req.body;
-    const deletedData = await Product.findByIdAndDelete(id);
+    const deletedData = await Product.findById(id);
     if (!deletedData) {
       res.status(400).json({ message: "Product not found" });
       return;
     }
-    res.status(200).json({ message: "Product deleted", deletedData });
+    const deletable = await Order.find({productId: id})
+    console.log(deletable)
+    if(deletable.length !==0){
+      res.status(400).json({message: "This Product cannot be removed because some information might be affected"})
+      return
+    }
+
+    const data = await Product.findByIdAndDelete(id)
+
+    res.status(200).json({ message: "Product deleted", data });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -389,44 +413,181 @@ router.get("/wishlist", authHandler, async (req, res) => {
 router.get("/mypurchase", authHandler, async (req, res) => {
   try {
     const userDetails = (req as any).user;
-    const cartItems = await Order.find({ buyerId: userDetails._id });
+    const cartItems = await Order.find({ buyerId: userDetails._id }).sort({
+      createdAt: -1,
+    });
 
     const safeData = await Promise.all(
       cartItems.map(async (item) => {
         const productDetail = await Product.findById(item.productId);
         const sellerDetail = await User.findOne({ _id: productDetail?.poster });
-        if(item.status !== "Cart"){
+        if (item.status !== "Cart") {
           return {
-          id: item._id,
-          orderNumber: item.orderNumber,
-          productId: item.productId,
+            id: item._id,
+            orderNumber: item.orderNumber,
+            productId: item.productId,
+            productName: productDetail?.productName,
+            productQTY: productDetail?.qty,
+            photo: productDetail?.photo[0],
+            price: productDetail?.price,
+            orderQty: item.orderQty,
+            shippingAddress: item.shippingAddress,
+            shippingZipcode: item.shippingZipcode,
+            shippingMethod: item.shippingMethod,
+            trackingNumber: item.trackingNumber,
+            status: item.status,
+            deliveryCharge: productDetail?.price! < 1500 ? 150 : 0,
+            sellerName:
+              sellerDetail.role === "User"
+                ? sellerDetail.firstName + " " + sellerDetail?.secondName
+                : "PixelKart",
+            sellerId: sellerDetail._id,
+            buyerName: userDetails.firstName + " " + userDetails?.secondName,
+            buyerId: userDetails._id,
+            buyerContact: item.buyerContact,
+            isReviewed: item.isReviewed,
+            orderData: item.orderData,
+          };
+        }
+      })
+    );
+    const validItems = safeData.filter(Boolean);
+    res.status(200).json({ message: "Cart items received", data: validItems });
+  } catch (error) {}
+});
+
+//Orders
+router.get("/order", authHandler, async (req, res) => {
+  try {
+    const userDetails = (req as any).user;
+    let filteredData;
+    if (userDetails.role === "User") {
+      const cartItems = await Order.find({ sellerId: userDetails._id }).sort({
+        createdAt: -1,
+      });
+      filteredData = await Promise.all(
+        cartItems.map(async (item) => {
+          const sellerdetail = await User.findOne({ _id: item.sellerId });
+          if (sellerdetail.role === "User" && item?.status !== "Cart") {
+            return item;
+          }
+          return null;
+        })
+      );
+    } else {
+      const cartItems = await Order.find().sort({ createdAt: -1 });
+      filteredData = await Promise.all(
+        cartItems.map(async (item) => {
+          const sellerdetail = await User.findOne({ _id: item.sellerId });
+          if (sellerdetail.role !== "User" && item?.status !== "Cart") {
+            return item;
+          }
+          return null;
+        })
+      );
+    }
+
+    const validItems = filteredData?.filter(Boolean);
+
+    const safeData = await Promise.all(
+      validItems!.map(async (item) => {
+        const productDetail = await Product.findById(item?.productId);
+        const sellerDetail = await User.findOne({ _id: productDetail?.poster });
+        const buyerDetail = await User.findOne({ _id: item?.buyerId });
+
+        return {
+          id: item?._id,
+          orderNumber: item?.orderNumber,
+          productId: item?.productId,
           productName: productDetail?.productName,
           productQTY: productDetail?.qty,
           photo: productDetail?.photo[0],
           price: productDetail?.price,
-          orderQty: item.orderQty,
-          shippingAddress: item.shippingAddress,
-          shippingZipcode: item.shippingZipcode,
-          shippingMethod: item.shippingMethod,
-          trackingNumber: item.trackingNumber,
-          status: item.status,
+          orderQty: item?.orderQty,
+          shippingAddress: item?.shippingAddress,
+          shippingZipcode: item?.shippingZipcode,
+          shippingMethod: item?.shippingMethod,
+          trackingNumber: item?.trackingNumber,
+          status: item?.status,
           deliveryCharge: productDetail?.price! < 1500 ? 150 : 0,
           sellerName:
             sellerDetail.role === "User"
               ? sellerDetail.firstName + " " + sellerDetail?.secondName
               : "PixelKart",
           sellerId: sellerDetail._id,
-          buyerName: userDetails.firstName + " " + userDetails?.secondName,
-          buyerId: userDetails._id,
-          buyerContact: item.buyerContact,
-          isReviewed: item.isReviewed,
-          orderData: item.orderData,
+          buyerName: buyerDetail.firstName + " " + buyerDetail?.secondName,
+          buyerId: buyerDetail._id,
+          buyerContact: item?.buyerContact,
+          isReviewed: item?.isReviewed,
+          orderData: item?.orderData,
         };
-        }
       })
     );
 
     res.status(200).json({ message: "Cart items received", data: safeData });
+  } catch (error) {}
+});
+
+//handling cancelling processing and other stages of product ordered
+router.put("/ordercancel", authHandler, async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const orderDetail = await Order.findOne({ _id: orderId });
+    if (!orderDetail) {
+      res.status(400).json({ message: "Order not found" });
+      return;
+    }
+    const productDetail = await Product.findOne({ _id: orderDetail.productId });
+
+    if (orderDetail.status === "Ordered") {
+      const newdata = await Order.findOneAndUpdate(
+        { _id: orderId },
+        {
+          status: "Cancelled",
+        },
+        {
+          new: true,
+        }
+      );
+      const newproduct = await Product.findOneAndUpdate(
+        { _id: orderDetail.productId },
+        {
+          qty: (productDetail?.qty ?? 0) + orderDetail?.orderQty,
+        },
+        {
+          new: true,
+        }
+      );
+    }
+    res.status(200).json({ message: "Order cancelled" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.put("/changeproductstatus", authHandler, async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const orderDetail = await Order.findOne({ _id: orderId });
+    if (!orderDetail) {
+      res.status(400).json({ message: "Order not found" });
+      return;
+    }
+    const updatedData = await Order.findOneAndUpdate(
+      { _id: orderId },
+      {
+        status:
+          orderDetail.status === "Ordered"
+            ? "Processing"
+            : orderDetail.status === "Processing"
+            ? "Shipped"
+            : "Delivered",
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({ message: `Order ${updatedData?.status}` });
   } catch (error) {}
 });
 
