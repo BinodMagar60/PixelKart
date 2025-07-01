@@ -41,6 +41,7 @@ const Checkout = () => {
     const { setApiChange } = useProductContext()
     const { state } = useLocation();
     const { cartItems, subtotal, delivery }: { cartItems: OrderItemType[], subtotal: number, delivery: number } = state || {};
+    
     const [loadingScreen, setLoadingScreen] = useState(false)
     const [orderData, setOrderData] = useState<OrderItemType[]>(cartItems)
 
@@ -93,6 +94,9 @@ const Checkout = () => {
         }
     }
 
+    if(!cartItems){
+        navigate("/")
+    }
     return (
         
             loadingScreen ? <OrderLoadingScreen /> : 

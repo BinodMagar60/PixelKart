@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { getSystemErrorMessage } from "util";
 import { Order } from "../models/Order";
 import { generateOrderId, generateRandomAlphanumericString } from "../utils/RandomOrderGenerator";
+import { Review } from "../models/Review";
 
 interface PhotoData {
   id: number;
@@ -210,6 +211,12 @@ router.get('/allproducts', async (req, res) => {
           url: item
         }))
 
+        const productReviews = await Review.find({productId: item._id})
+        let totalRating = 0
+        let totalRated = productReviews.length
+        productReviews.forEach(item => totalRating += item.reviewStar)
+        let avgRating = totalRated === 0? 0 : (totalRating/totalRated)
+
         return {
           id: item._id,
           poster: item.role === "User"
@@ -228,7 +235,9 @@ router.get('/allproducts', async (req, res) => {
           views: item.views,
           soldNumber: 0,
           createdAt: item.createdAt,
-          userWishlist: item.userWishlist
+          userWishlist: item.userWishlist,
+          totalRated: totalRated,
+          avgRating: avgRating,
         };
       })
     );
@@ -239,6 +248,20 @@ router.get('/allproducts', async (req, res) => {
   }
 });
 
+
+
+router.get('/review/:productId', async(req, res) => {
+  try {
+
+    const {productId} = req.params
+    console.log(productId)
+    console.log('first')
+    const allReivew = await Review.find({productId: productId}).select("-__v -updatedAt")
+    res.status(200).json({message: "Product Review received", data: allReivew})
+  } catch (error) {
+   res.status(500).json({message: "Server error", error}) 
+  }
+})
 
 
 router.put("/updatefavourite", authHandler, async (req, res) => {

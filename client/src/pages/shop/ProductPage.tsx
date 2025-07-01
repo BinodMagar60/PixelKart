@@ -8,8 +8,10 @@ const ProductPage = () => {
   
   const [searchParams] = useSearchParams()
   const category = searchParams.get('category')
+  const q = searchParams.get('q')
 
-  console.log(category)
+  const searchQuery = q? q: ""
+  // console.log(category)
   const [isFilterActive, setIsFilterActive] = useState<boolean>(false)
 
   const [filterdata, setfilterdata] = useState({
@@ -26,7 +28,7 @@ const ProductPage = () => {
           <FilterPanel isFilterActive={isFilterActive} setIsFilterActive={setIsFilterActive} />
         </div>
         <div className="w-full">
-          <Products setIsFilterActive={setIsFilterActive} />
+          <Products setIsFilterActive={setIsFilterActive} searchQuery={searchQuery} />
         </div>
       </div>
     </div>

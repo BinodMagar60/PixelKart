@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircle, ShoppingCart, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,6 +43,18 @@ const OrderLoadingScreen: React.FC = () => {
 
 const OrderSuccessScreen = () => {
     const navigate = useNavigate()
+      useEffect(() => {
+    const handlePopState = () => {
+      window.history.pushState(null, '', window.location.href);
+    };
+
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-2xl p-12 max-w-md w-full mx-4 text-center">

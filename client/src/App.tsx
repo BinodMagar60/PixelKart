@@ -27,6 +27,7 @@ import Overview from "./pages/admin/Overview"
 import Cart from "./pages/shop/Cart"
 import Checkout from "./pages/shop/Checkout"
 import { OrderSuccessScreen } from "./loading/OrderLoading"
+import ProtectedCartRoute from "./utils/ProtectedCartRoutes"
 
 
 const router = createBrowserRouter([
@@ -130,7 +131,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/cart",
-    element: <ProtectedRoute />,
+    element: <ProtectedCartRoute />,
     errorElement: <Error />,
     children: [
       {

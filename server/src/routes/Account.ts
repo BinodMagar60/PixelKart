@@ -9,6 +9,7 @@ import Category from "../models/Category";
 import { Product } from "../models/Product";
 import mongoose from "mongoose";
 import { Order } from "../models/Order";
+import { Review } from "../models/Review";
 
 const updatepasswordvalidation = z
   .object({
@@ -137,7 +138,7 @@ router.get("/usermanagement", async (req, res) => {
 
         const validOrders = boughtOrders.filter((item) => {
           if (!["Cart", "Cancelled"].includes(item.status)) {
-            return item
+            return item;
           }
         });
 
@@ -366,14 +367,17 @@ router.delete("/inventory", async (req, res) => {
       res.status(400).json({ message: "Product not found" });
       return;
     }
-    const deletable = await Order.find({productId: id})
-    console.log(deletable)
-    if(deletable.length !==0){
-      res.status(400).json({message: "This Product cannot be removed because some information might be affected"})
-      return
+    const deletable = await Order.find({ productId: id });
+    console.log(deletable);
+    if (deletable.length !== 0) {
+      res.status(400).json({
+        message:
+          "This Product cannot be removed because some information might be affected",
+      });
+      return;
     }
 
-    const data = await Product.findByIdAndDelete(id)
+    const data = await Product.findByIdAndDelete(id);
 
     res.status(200).json({ message: "Product deleted", data });
   } catch (error) {
@@ -421,6 +425,7 @@ router.get("/mypurchase", authHandler, async (req, res) => {
       cartItems.map(async (item) => {
         const productDetail = await Product.findById(item.productId);
         const sellerDetail = await User.findOne({ _id: productDetail?.poster });
+        const ReviewData = await Review.findOne({ orderId: item._id });
         if (item.status !== "Cart") {
           return {
             id: item._id,
@@ -445,7 +450,7 @@ router.get("/mypurchase", authHandler, async (req, res) => {
             buyerName: userDetails.firstName + " " + userDetails?.secondName,
             buyerId: userDetails._id,
             buyerContact: item.buyerContact,
-            isReviewed: item.isReviewed,
+            isReviewed: ReviewData ? true : false,
             orderData: item.orderData,
           };
         }
@@ -455,6 +460,128 @@ router.get("/mypurchase", authHandler, async (req, res) => {
     res.status(200).json({ message: "Cart items received", data: validItems });
   } catch (error) {}
 });
+
+//review add
+router.post("/review", authHandler, async (req, res) => {
+  try {
+    const userDetails = (req as any).user;
+    const { orderId, productId, reviewStar, reviewComment } = req.body;
+
+    if (
+      !orderId ||
+      !productId ||
+      reviewStar === undefined ||
+      reviewStar === null ||
+      !reviewComment
+    ) {
+      res.status(400).json({ message: "Missing values" });
+      return;
+    }
+
+    const orderDetail = await Order.findOne({ _id: orderId });
+    if (orderDetail?.status !== "Delivered") {
+      res.status(400).json({ message: "Couldnt add review" });
+      return;
+    }
+
+    const existingReview = await Review.findOne({ orderId: orderId });
+    if (existingReview) {
+      res.status(400).json({ message: "Review already exists" });
+      return;
+    }
+
+    const newdata = new Review({
+      orderId: orderId,
+      productId: productId,
+      reviewerId: userDetails._id,
+      reviewStar: reviewStar,
+      reviewComment: reviewComment,
+    });
+
+    const addedReview = await newdata.save();
+    const updatedProduct = await Order.findOneAndUpdate(
+      { _id: orderId },
+      {
+        isReviewed: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({ message: "Review Added", data: addedReview });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//get review datas
+router.get("/review/:orderId", authHandler, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const orderExist = await Order.findOne({ _id: orderId });
+    if (!orderExist) {
+      res.status(400).json({
+        message: "Something went wrong with order details. Try again",
+      });
+      return;
+    }
+    const reviewData = await Review.findOne({ orderId: orderId }).select(
+      "-__v -updatedAt"
+    );
+    if (!reviewData) {
+      res.status(401).json({ message: "No review found" });
+      return;
+    }
+    res.status(200).json({ message: "Review data retrive", data: reviewData });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//update reviews data
+router.put("/review", authHandler, async (req, res) => {
+  try {
+    const { reviewId, reviewStar, reviewComment } = req.body;
+    console.log(reviewStar)
+    if (
+      !reviewId ||
+      !reviewComment ||
+      typeof reviewStar !== "number"
+    ) {
+      res.status(400).json({ message: "Missing field" });
+      return;
+    }
+
+    const newdata = await Review.findOneAndUpdate(
+      { _id: reviewId },
+      { reviewStar: reviewStar, reviewComment: reviewComment },
+      { new: true }
+    );
+    if (!newdata) {
+      res.status(400).json({ message: "Failed to update review" });
+      return;
+    }
+    res.status(200).json({message: "Update successfull", data: newdata})
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.delete('/review/:id', authHandler, async(req, res)=> {
+  try {
+    const {id} = req.params
+    const deletedData = await Review.findByIdAndDelete(id)
+    if(!deletedData){
+      res.status(400).json({message: "Fail to delete review"})
+      return
+    }
+    res.status(200).json({message: "Review deleted", data: deletedData})
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
 
 //Orders
 router.get("/order", authHandler, async (req, res) => {

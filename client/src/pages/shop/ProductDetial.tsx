@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Navbar from "../../components/Navbar"
 import { Cpu, Heart, Laptop, Monitor, Package, RotateCcw, Shield, ShoppingCart, Star, Truck } from "lucide-react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useProductContext } from "../../context/ProductContext"
 import { useUserContext } from "../../context/UserContext"
 import DOMPurify from 'dompurify';
-import { addToCart, favouriteUpdate } from "../../api/ProductAPI"
+import { addToCart, favouriteUpdate, getProductReviews } from "../../api/ProductAPI"
 import { toast } from "react-toastify"
 
 
@@ -69,27 +69,11 @@ const shippingAndReturns: shippingAndReturnsType[] = [
 
 
 interface userReviewersTypes {
-    id: number,
+    id: string,
     rating: number,
     name: string,
     description: string,
 }
-
-const userReviewers: userReviewersTypes[] = [
-    {
-        id: 1,
-        rating: 1,
-        name: "Binod Magar",
-        description: "Excellent gaming laptop! The RTX 4070 handles all my games at high settings. Fast delivery and great packaging."
-    },
-    {
-        id: 2,
-        rating: 4,
-        name: "Bijan Adhakari",
-        description: "Great performance for the price. Only minor complaint is the fan can get a bit loud under heavy load."
-    }
-]
-
 
 
 
@@ -100,13 +84,9 @@ const ProductDetial = () => {
     const { id } = useParams()
     const productId = id
     const { products, updateproductwishlist } = useProductContext()
-
-
-
     const product = useMemo(() => {
         return products.find(item => item.id === productId)
     }, [products, productId])
-
 
     const productImages = product?.photo;
 
@@ -114,8 +94,20 @@ const ProductDetial = () => {
     const [productRating, setProductRating] = useState<number>(0)
     const [productStarRating, setProductStarRating] = useState<number>(0)
     const [selectedImg, setSelectedImg] = useState(1)
+    const [userReviewers, setUserReviews] = useState<userReviewersTypes[]>([])
+    const navigate = useNavigate()
 
-
+    useEffect(()=> {
+        const getReviews = async() => {
+            try {
+                const response = await getProductReviews(`review/${id}`)
+                console.log(response)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getReviews()
+    },[])
 
 
     useEffect(() => {
@@ -215,6 +207,38 @@ const ProductDetial = () => {
     }
 
 
+    const handleBuyNow = async () => {
+        try {
+            const newData = {
+                productId: productId ?? "",
+            }
+
+            const response = await addToCart('cart', newData)
+            if(response.status === 400 || response.status === 500){
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+            if(response.status === 401){
+                toast.info(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+            }
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: 'light'
+            })
+            setTimeout(() => {
+                navigate('/cart')
+            }, 1500);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     if (!product) {
         return <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center">
@@ -279,7 +303,7 @@ const ProductDetial = () => {
                                     <div className={`bg-black text-white text-xs font-semibold w-fit px-3 py-0.5 hover:bg-gray-800 rounded-2xl ${product.qty === 0 ? "bg-red-500" : ""}`}>{product.qty > 0 ? product?.condition : "Out of stock"}</div>
                                     <div className="text-4xl font-bold">{product?.productName}</div>
                                     <div className="flex gap-4">
-                                        <span className="flex items-center gap-2"><span><Star color="orange" fill="orange" size={20} /></span> <span className="font-semibold">4.8</span> <span className="text-gray-600">(124 reviews)</span></span>
+                                        <span className="flex items-center gap-2"><span><Star color="orange" fill="orange" size={20} /></span> <span className="font-semibold">{product.avgRating}</span> <span className="text-gray-600">({product.totalRated})</span></span>
                                         <span className="text-gray-600">by {product?.poster}</span>
                                     </div>
                                     <div className="flex gap-2">
@@ -308,7 +332,7 @@ const ProductDetial = () => {
                                                     <span><ShoppingCart size={18} /></span>
                                                     <span>Add to Cart</span>
                                                 </button>
-                                                <button className=" border border-gray-300 w-full bg-white text-black font-semibold p-2 rounded-md cursor-pointer hover:bg-gray-200">Buy Now</button>
+                                                <button className=" border border-gray-300 w-full bg-white text-black font-semibold p-2 rounded-md cursor-pointer hover:bg-gray-200" onClick={handleBuyNow}>Buy Now</button>
                                                 {
                                                     userInfo?.role === 'User' && (
                                                         <button className="border p-2.5 rounded-md cursor-pointer border-gray-300 bg-white hover:bg-gray-200 transition-all ease-in-out" onClick={() => favourite()}><Heart size={20} color={product.userWishlist.includes(userInfo?._id) ? "red" : "black"} fill={product.userWishlist.includes(userInfo?._id) ? "red" : "white"} /></button>

@@ -6,7 +6,8 @@ import { getcategory } from "../api/AccountAPI";
 
 type propsTypes = {
     isFilterActive: boolean,
-    setIsFilterActive: React.Dispatch<SetStateAction<boolean>>
+    setIsFilterActive: React.Dispatch<SetStateAction<boolean>>,
+    
 }
 
 

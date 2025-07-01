@@ -18,6 +18,8 @@ export type ProductType = {
     soldNumber: Number;
     createdAt: Date | null,
     userWishlist: string[],
+    totalRated: number,
+    avgRating: number,
 };
 
 export type ProductContextType = {

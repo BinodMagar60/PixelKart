@@ -44,7 +44,7 @@ const favourite = async(e: React.MouseEvent<HTMLButtonElement>) => {
       <div><img src={product.photo[0].url} alt="motherboard.png" className="h-44 min-w-68 object-cover rounded-md"/></div>
       <div className="space-y-1.5 mt-3 mb-1 text-gray-950">
         <div className="font-semibold leading-tight text-xl">{product.productName}</div>
-        <div className="flex gap-1 items-center text-sm"><span className="text-yellow-400 fill-yellow-400 "><StarIcon size={16} fill="yellow-400"/></span> 4.8 (123)</div>
+        <div className="flex gap-1 items-center text-sm"><span className="text-yellow-400 fill-yellow-400 "><StarIcon size={16} fill="yellow-400"/></span> {product.avgRating} ({product.totalRated})</div>
         <div className="text-gray-600 text-xs">By {product.poster}</div>
         <div className="flex justify-between items-center">
           <div className="flex gap-2 font-semibold"><span >Rs.{product.price}</span>

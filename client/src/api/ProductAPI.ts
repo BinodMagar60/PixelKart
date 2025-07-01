@@ -50,6 +50,18 @@ export const addnewproduct = async(route: string, data:unknown) => {
     }
 }
 
+export const getProductReviews = async(route: string) => {
+    try{
+        const response = await axios.get(URL+route)
+        return response.data
+    }
+    catch(error){
+        const err = error as AxiosError
+        return err?.response
+    }
+}
+
+
 
 
 export const uploadToCloudinary = async (file: File): Promise<string> => {

@@ -1,7 +1,7 @@
-import { Eye } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Eye, Star } from "lucide-react"
+import React, { useEffect, useState } from "react"
 import { formatDateToReadable } from "../../utils/DateConverter"
-import { cancelOrder, getMypurchase } from "../../api/AccountAPI";
+import { addReview, cancelOrder, deleteReview, getMypurchase, getReview, updateReview } from "../../api/AccountAPI";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useProductContext } from "../../context/ProductContext";
@@ -41,8 +41,10 @@ export interface purchaseType {
 
 
 const MyPurchases = () => {
-    const {setApiChange} = useProductContext()
+    const { setApiChange } = useProductContext()
     const [openDetail, setOpenDetail] = useState(false)
+    const [change, setchange] = useState(false)
+
     const [selectedProduct, setSelectedProduct] = useState<purchaseType>({
         id: "",
         orderNumber: "",
@@ -80,15 +82,15 @@ const MyPurchases = () => {
             }
         }
         apicall()
-    }, [])
+    }, [change])
 
 
 
 
     const handleCancel = async (id: string) => {
         try {
-            const response = await cancelOrder('account/ordercancel', {orderId: id})
-            if(response.status === 400 || response.status === 500){
+            const response = await cancelOrder('account/ordercancel', { orderId: id })
+            if (response.status === 400 || response.status === 500) {
                 toast.error(response.data.message, {
                     autoClose: 1000,
                     theme: 'light'
@@ -110,7 +112,7 @@ const MyPurchases = () => {
                 setSelectedProduct(prev => ({ ...prev, status: "Cancelled" }));
             }
             setApiChange(prev => !prev)
-            
+
         } catch (error) {
             console.log(error)
         }
@@ -160,7 +162,7 @@ const MyPurchases = () => {
                 )
             }
             {
-                openDetail && <MyOrderList setOpenDetail={setOpenDetail} selectedProduct={selectedProduct} handleCancel={handleCancel} />
+                openDetail && <MyOrderList setOpenDetail={setOpenDetail} selectedProduct={selectedProduct} handleCancel={handleCancel} setchange={setchange} setSelectedProduct={setSelectedProduct} change={change} />
             }
         </>
     )
@@ -169,11 +171,134 @@ const MyPurchases = () => {
 interface MyOrderListTypes {
     setOpenDetail: React.Dispatch<React.SetStateAction<boolean>>,
     selectedProduct: purchaseType,
-    handleCancel: (id: string) => void
+    setSelectedProduct: React.Dispatch<React.SetStateAction<purchaseType>>
+    handleCancel: (id: string) => void,
+    setchange: React.Dispatch<React.SetStateAction<boolean>>,
+    change: boolean
 }
 
-const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel }: MyOrderListTypes) => {
+interface IReview {
+    _id: string,
+    orderId: string,
+    productId: string,
+    reviewerId: string,
+    reviewStar: number,
+    reviewComment: string,
+    createdAt: string
+}
+
+const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel, change, setchange, setSelectedProduct }: MyOrderListTypes) => {
     const navigate = useNavigate()
+
+    const [reviewComment, setReviewComment] = useState("")
+    const [reviewStar, setReviewStar] = useState<number>(0)
+    const [reviewData, setReviewData] = useState<IReview | null>(null)
+
+    useEffect(() => {
+        const apiCall = async () => {
+            try {
+                const response = await getReview(`account/review/${selectedProduct.id}`)
+                setReviewData(response.data)
+                setReviewComment(response.data.reviewComment)
+                setReviewStar(response.data.reviewStar)
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        if (selectedProduct.isReviewed) {
+            apiCall()
+        }
+    }, [change])
+
+
+    const handleReviewAdd = async () => {
+        try {
+            const newData = {
+                orderId: selectedProduct.id,
+                productId: selectedProduct.productId,
+                reviewStar: reviewStar,
+                reviewComment: reviewComment,
+            }
+
+            const response = await addReview('account/review', newData)
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: 'light   '
+            })
+            setchange(prev => !prev)
+
+            setSelectedProduct(item => ({ ...item, isReviewed: true }))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+    const handleReviewUpdate = async () => {
+        try {
+            const newData = {
+                reviewId: reviewData!._id,
+                reviewStar: reviewStar,
+                reviewComment: reviewComment,
+            }
+
+            const response = await updateReview('account/review', newData)
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: 'light   '
+            })
+            setchange(prev => !prev)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleReviewDelete = async () => {
+        try {
+           
+
+            const response = await deleteReview(`account/review/${reviewData?._id}`)
+            if (response.status === 400 || response.status === 500) {
+                toast.error(response.data.message, {
+                    autoClose: 1000,
+                    theme: 'light'
+                })
+                return
+            }
+
+            toast.success(response.message, {
+                autoClose: 1000,
+                theme: 'light   '
+            })
+            setchange(prev => !prev)
+            setReviewStar(0)
+            setReviewComment("")
+            setSelectedProduct(item => ({ ...item, isReviewed: false }))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+
+
     return (
         <div className="w-full">
             <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
@@ -199,36 +324,38 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel }: MyOrderLi
                 </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
+                <div>
+                    <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
 
-                    <div className="text-black font-semibold text-xl">Shipping Details & Order Status</div>
+                        <div className="text-black font-semibold text-xl">Shipping Details & Order Status</div>
 
-                    <div className="space-y-2 mt-8 leading-6">
-                        <div >
-                            <div className="font-semibold">Shipping Address:</div>
-                            <div className=" text-gray-600">{selectedProduct.shippingAddress}</div>
+                        <div className="space-y-2 mt-8 leading-6">
+                            <div >
+                                <div className="font-semibold">Shipping Address:</div>
+                                <div className=" text-gray-600">{selectedProduct.shippingAddress}</div>
+                            </div>
+                            <div >
+                                <div className="font-semibold">Shipping Method:</div>
+                                <div className=" text-gray-600">Standard Shipping</div>
+                            </div>
+                            <div >
+                                <div className="font-semibold">Tracking Number:</div>
+                                <div className=" text-gray-600">{selectedProduct.trackingNumber}</div>
+                            </div>
+                            <div >
+                                <div className="font-semibold">Status</div>
+                                <div className="text-sm text-gray-600">{selectedProduct.status === "Cancelled" ? <span className="text-red-500">Cancelled</span> : selectedProduct.status}</div>
+                            </div>
+                            <div>
+                                {
+                                    selectedProduct.status === "Ordered" && (
+                                        <button className="w-full px-3 py-2 bg-black text-white font-semibold rounded-md hover:bg-gray-800 cursor-pointer mt-6" onClick={() => handleCancel(selectedProduct.id)}>Cancel</button>
+                                    )
+                                }
+                            </div>
                         </div>
-                        <div >
-                            <div className="font-semibold">Shipping Method:</div>
-                            <div className=" text-gray-600">Standard Shipping</div>
-                        </div>
-                        <div >
-                            <div className="font-semibold">Tracking Number:</div>
-                            <div className=" text-gray-600">{selectedProduct.trackingNumber}</div>
-                        </div>
-                        <div >
-                            <div className="font-semibold">Status</div>
-                            <div className="text-sm text-gray-600">{selectedProduct.status === "Cancelled" ? <span className="text-red-500">Cancelled</span> : selectedProduct.status}</div>
-                        </div>
-                        <div>
-                            {
-                                selectedProduct.status === "Ordered" && (
-                                    <button className="w-full px-3 py-2 bg-black text-white font-semibold rounded-md hover:bg-gray-800 cursor-pointer mt-6" onClick={() => handleCancel(selectedProduct.id)}>Cancel</button>
-                                )
-                            }
-                        </div>
+
                     </div>
-
                 </div>
                 <div>
                     <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
@@ -252,7 +379,48 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel }: MyOrderLi
                                 <div>Rs. {selectedProduct.price * selectedProduct.orderQty}</div>
                             </div>
                         </div>
+
+
                     </div>
+                    {
+                        selectedProduct.status === "Delivered" && <div className="w-full bg-white px-4 py-6 mb-6 shadow-sm rounded-md">
+                            <div className="text-black font-semibold text-xl">Review</div>
+                            <div className="mt-6 space-y-4">
+                                <div className="flex gap-1">
+                                    {
+                                        [1, 2, 3, 4, 5].map(item => (
+                                            <Star key={item}
+                                                onClick={() => {
+                                                    reviewStar === item ? setReviewStar(0) : setReviewStar(item)
+                                                }}
+                                                fill={reviewStar >= item ? "#F0B100" : "white"}
+                                                className={`w-6 h-6 cursor-pointer transition-colors ${reviewStar >= item ? "text-yellow-500" : "text-gray-300"
+                                                    }`}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                                <div>
+                                    {/* <div className="whitespace-pre-wrap">{reviewComment}</div> */}
+                                    <textarea rows={6} placeholder="Reivew..." className="w-full border resize-none border-gray-300 rounded-md p-2" onChange={(e) => { setReviewComment(e.target.value) }} value={reviewComment} />
+                                </div>
+                                <div>
+
+                                    {
+                                        selectedProduct.isReviewed ? <div className="space-y-1">
+                                            <button className="cursor-pointer w-full border rounded-md border-gray-300 bg-gray-100 px-4 py-2  hover:bg-gray-200" onClick={handleReviewUpdate}>Update</button>
+                                            <button className="cursor-pointer w-full border rounded-md text-white px-4 py-2 bg-red-600 hover:bg-red-400" onClick={handleReviewDelete}>Delete Reivew</button>
+                                        </div> : <div>
+                                            <button className="w-full bg-black text-white px-4 py-2 rounded-md cursor-pointer hover:bg-gray-800" onClick={handleReviewAdd}>Add Review</button>
+                                        </div>
+                                    }
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

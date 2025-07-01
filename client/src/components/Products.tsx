@@ -5,10 +5,11 @@ import { useProductContext } from "../context/ProductContext";
 
 
 type PropsTypes = {
-        setIsFilterActive: React.Dispatch<React.SetStateAction<boolean>>
+        setIsFilterActive: React.Dispatch<React.SetStateAction<boolean>>,
+        searchQuery: string
     }
 
-const Products = ({setIsFilterActive}:PropsTypes) => {
+const Products = ({setIsFilterActive, searchQuery}:PropsTypes) => {
 
     const {products} = useProductContext()
 
@@ -23,7 +24,7 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
 
     type optionType = "Price: Low to High" | "Price: High to Low" | "Highest Rated" | "Newest"
 
-
+    const [Product, setProduct] = useState(products)
     const [selected, setSelected] = useState<optionType>("Highest Rated");
     const [open, setOpen] = useState(false);
     const [loadmore, setLoadmore] = useState(16)
@@ -33,6 +34,12 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
             setLoadmore(prev => prev + 12)
         }
     }
+
+    const filteredData = Product.filter(item=> {
+        return item.productName.toLowerCase().includes(searchQuery)
+    })
+
+    
 
     return (
         <div className="w-full pb-8">
@@ -78,12 +85,12 @@ const Products = ({setIsFilterActive}:PropsTypes) => {
             </div>
             <div className="mt-4 w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-x-2 gap-y-4">
                {
-                products.slice(0,loadmore).map(item => (
+                filteredData.slice(0,loadmore).map(item => (
                     <span key={item.id}><Card product={item}/></span>
                 ))
                }
             </div>
-            <div className="mb-14 mt-8 w-full flex justify-center"><button className={`px-4 py-2 bg-black border border-gray-300 rounded-md text-white cursor-pointer hover:bg-transparent hover:text-black transition-all duration-300 ease-in-out ${loadmore>products.length? 'hidden':'block'}`} onClick={handleLoadMore}>Load More</button></div>
+            <div className="mb-14 mt-8 w-full flex justify-center"><button className={`px-4 py-2 bg-black border border-gray-300 rounded-md text-white cursor-pointer hover:bg-transparent hover:text-black transition-all duration-300 ease-in-out ${loadmore>=filteredData.length? 'hidden':'block'}`} onClick={handleLoadMore}>Load More</button></div>
         </div>
     )
 }
