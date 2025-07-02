@@ -1,17 +1,49 @@
-import { Eye, Heart, Package, ShoppingBag, Store } from "lucide-react"
+import { Boxes, Heart, Package, ShoppingBag, Store } from "lucide-react"
 import { useEffect, useRef, useState } from "react";
+import { getDashboardDetails } from "../../api/AccountAPI";
 
+interface IRecent {
+    id: string,
+    name: string,
+    orderedDate: string,
+    status: string,
+}
 
+interface IActive {
+    id: string,
+    name: string,
+    qty: number,
+    price: number,
+}
 
 const iconSize = 32;
 
 
 const Dashboard = () => {
 
-    const [totalItemsSales, setTotalItemsSales] = useState(12)
-    const [totalPurchase, setTotalPurchase] = useState(3)
-    const [totalItemsSold, setTotalItemsSold] = useState(4)
-    const [totalWishlist, setTotalWishlist] = useState(8)
+    const [totalItemsSales, setTotalItemsSales] = useState(0)
+    const [totalPurchase, setTotalPurchase] = useState(0)
+    const [totalItemsSold, setTotalItemsSold] = useState(0)
+    const [totalWishlist, setTotalWishlist] = useState(0)
+    const [recentPurchases, setrecentPurchases] = useState<IRecent[]>([])
+    const [activeListings, setactiveListings] = useState<IActive[]>([])
+
+    useEffect(() => {
+        const apicall = async () => {
+            try {
+                const response = await getDashboardDetails()
+                setTotalItemsSales(response.data.totalItemsForSales )
+                setTotalPurchase(response.data.totalItemPurchased   )
+                setTotalItemsSold(response.data.totalItemSold   )
+                setTotalWishlist(response.data.totalItemWishlisted  )
+                setrecentPurchases(response.data.recentPurchasesData    )
+                setactiveListings(response.data.activeItemListing   )
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        apicall()
+    }, [])
 
     const [animatedValues, setAnimatedValues] = useState({
         sales: 0,
@@ -85,110 +117,6 @@ const Dashboard = () => {
         }
     ]
 
-
-    const recentPurchases = [
-        {
-            id: 1,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Delivered",
-        },
-        {
-            id: 2,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Processing",
-        },
-        {
-            id: 3,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Cancelled",
-        },
-        {
-            id: 4,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Shipping",
-        },
-        {
-            id: 5,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Delivered",
-        },
-        {
-            id: 6,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Delivered",
-        },
-        {
-            id: 7,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Delivered",
-        },
-        {
-            id: 8,
-            name: "Gaming Laptop",
-            orderedDate: "20 Jan, 2025",
-            status: "Delivered",
-        },
-    ]
-
-    const activeListings = [
-        {
-            id: 1,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        },
-        {
-            id: 2,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        },
-        {
-            id: 3,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        },
-        {
-            id: 4,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        },
-        {
-            id: 5,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        }, {
-            id: 6,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        },
-        {
-            id: 7,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        },
-        {
-            id: 8,
-            name: "Used Gaming Mouse",
-            views: 23,
-            price: 1200,
-        }
-    ]
-
-
-
     return (
         <div className="w-full">
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -206,12 +134,12 @@ const Dashboard = () => {
                 ))}
             </div>
             <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 pb-2">
-                <div className="bg-white rounded-md p-5 h-full shadow-sm">
+                <div className="bg-white rounded-md p-5 h-fit shadow-sm">
                     <div className="leading-8 mb-4">
                         <div className="text-xl font-semibold">Recent Purchases</div>
                         <div className="text-gray-600 text-sm">Your Latest Purchases</div>
                     </div>
-                    <div className="flex flex-col gap-2 max-h-140 overflow-y-auto overflow-hidden" style={{
+                    <div className="flex flex-col gap-2 max-h-100 overflow-y-auto overflow-hidden" style={{
                         scrollbarWidth: "none"
                     }}>
                         {
@@ -236,12 +164,12 @@ const Dashboard = () => {
 
 
                 {/* system alerts */}
-                <div className="bg-white rounded-md p-5 h-full shadow-sm">
+                <div className="bg-white rounded-md p-5 h-fit shadow-sm">
                     <div className="leading-8 mb-4">
                         <div className="text-xl font-semibold">Active Listings</div>
                         <div className="text-gray-600 text-sm">Your recent current items for sales</div>
                     </div>
-                    <div className="flex flex-col gap-2 max-h-140 overflow-y-auto overflow-hidden" style={{
+                    <div className="flex flex-col gap-2 max-h-100 overflow-y-auto overflow-hidden" style={{
                         scrollbarWidth: "none"
                     }}>
                         {
@@ -250,9 +178,9 @@ const Dashboard = () => {
                             </div>) : (
                                 activeListings.map((item) => (
                                     <div className="flex justify-between p-3 bg-gray-100 rounded-md" key={item.id}>
-                                        <div className="leading-7">
+                                        <div className="leading-8">
                                             <div className="whitespace-nowrap truncate max-w-120">{item.name}</div>
-                                            <div className="text-sm text-gray-600 flex gap-1 items-center"><span><Eye size={16}/></span>{item.views} views</div>
+                                            <div className="text-sm text-gray-600 flex gap-1 items-center"><span><Boxes size={16} /></span>{item.qty}</div>
                                         </div>
                                         <div className="text-right flex items-center">
                                             <div className="font-semibold text-lg">Rs {item.price}</div>

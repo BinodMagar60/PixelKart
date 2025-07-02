@@ -88,11 +88,12 @@ const ProductDetial = () => {
         return products.find(item => item.id === productId)
     }, [products, productId])
 
+
+
     const productImages = product?.photo;
 
     const [productDetails, setProductDetails] = useState<productdetailTypes>("Description")
-    const [productRating, setProductRating] = useState<number>(0)
-    const [productStarRating, setProductStarRating] = useState<number>(0)
+    
     const [selectedImg, setSelectedImg] = useState(1)
     const [userReviewers, setUserReviews] = useState<userReviewersTypes[]>([])
     const navigate = useNavigate()
@@ -101,7 +102,7 @@ const ProductDetial = () => {
         const getReviews = async() => {
             try {
                 const response = await getProductReviews(`review/${id}`)
-                console.log(response)
+                setUserReviews(response.data)
             } catch (error) {
                 console.log(error)
             }
@@ -121,17 +122,7 @@ const ProductDetial = () => {
     }, [productImages]);
 
 
-    useEffect(() => {
-        var totalRate = 0
-        userReviewers.map(index => {
-            totalRate = totalRate + index.rating
-        })
-        const newRate = totalRate / (userReviewers.length)
-        const newStarRating = customRound(newRate)
-        setProductRating(newRate)
-        setProductStarRating(newStarRating)
-    }, [])
-
+    
     function customRound(num: number): number {
         if (num <= 0) return 0;
         if (num >= 5) return 5;
@@ -146,12 +137,17 @@ const ProductDetial = () => {
     }
 
     useEffect(() => {
-        if (product) {
-            setTimeout(() => {
-                setProductDetailLoading(false)
-            }, 1500);
-        }
-    }, [product])
+  setProductDetailLoading(true); 
+
+  if (product) {
+    const timeout = setTimeout(() => {
+      setProductDetailLoading(false); 
+    }, 1500);
+
+    return () => clearTimeout(timeout); 
+  }
+}, [id, product]);
+
 
 
 
@@ -359,7 +355,7 @@ const ProductDetial = () => {
                             <div className="w-full bg-white mt-10 p-4 rounded-md text-sm shadow-sm">
                                 <div className="p-1 rounded-sm bg-gray-100 flex gap-0.5 w-fit">
                                     <button className={`px-2 py-1 rounded-sm transition-all duration-100 cursor-pointer ${productDetails === "Description" ? "bg-white text-black" : "text-gray-500"}`} onClick={() => { onDescriptionHandleChange("Description") }}>Description</button>
-                                    <button className={`px-2 py-1 rounded-sm transition-all duration-100 cursor-pointer ${productDetails === "Reviews" ? "bg-white text-black" : "text-gray-500"}`} onClick={() => { onDescriptionHandleChange("Reviews") }}>Reviews (128)</button>
+                                    <button className={`px-2 py-1 rounded-sm transition-all duration-100 cursor-pointer ${productDetails === "Reviews" ? "bg-white text-black" : "text-gray-500"}`} onClick={() => { onDescriptionHandleChange("Reviews") }}>Reviews ({product.totalRated})</button>
                                     <button className={`px-2 py-1 rounded-sm transition-all duration-100 cursor-pointer ${productDetails === "Shipping & Returns" ? "bg-white text-black" : "text-gray-500"}`} onClick={() => { onDescriptionHandleChange("Shipping & Returns") }}>Shipping & Returns</button>
                                 </div>
                                 {
@@ -382,26 +378,26 @@ const ProductDetial = () => {
                                     productDetails === "Reviews" && (
                                         <div className="mt-4 py-4">
                                             <div className="w-fit text-center">
-                                                <div className="text-2xl font-bold">{productRating}</div>
+                                                <div className="text-2xl font-bold">{product.avgRating}</div>
                                                 <div className="flex">
                                                     {
                                                         Array.from({ length: 5 }, (_, i) => (
-                                                            <Star key={i} strokeWidth={1} size={20} color={i < productStarRating ? "#ffd800" : "#adb5bd"} fill={i < productStarRating ? "#ffd800" : "white"} />
+                                                            <Star key={i} strokeWidth={1} size={20} color={i < customRound(product.avgRating) ? "#ffd800" : "#adb5bd"} fill={i < customRound(product.avgRating) ? "#ffd800" : "white"} />
                                                         ))
                                                     }
                                                 </div>
-                                                <div className="text-gray-600">128 reviews</div>
+                                                <div className="text-gray-600">{product.totalRated} reviews</div>
                                             </div>
                                             <div>
                                                 <div>
                                                     {
-                                                        userReviewers.map((item) => (
-                                                            <div key={item.id} className="py-4 border-b border-gray-300 leading-8 text-gray-600">
+                                                        userReviewers.map((item, index) => (
+                                                            <div key={index} className="py-4 border-b border-gray-300 leading-8 text-gray-600">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="flex">
                                                                         {
                                                                             Array.from({ length: 5 }, (_, i) => (
-                                                                                <Star key={i} strokeWidth={1} size={16} color={i < item.rating ? "#ffd800" : "#adb5bd"} fill={i < item.rating ? "#ffd800" : "white"} />
+                                                                                <Star key={i} strokeWidth={1} size={16} color={i < customRound(item.rating) ? "#ffd800" : "#adb5bd"} fill={i < customRound(item.rating) ? "#ffd800" : "white"} />
                                                                             ))
                                                                         }
                                                                     </div>

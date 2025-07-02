@@ -28,7 +28,7 @@ const items: itemsToShow[] = [
     },
     {
         id: 3,
-        name: "GPU",
+        name: "Graphic Card",
         description: "Buy the best Graphic Cards from all around the country",
         buttonDetail: "Shop GPU",
         image: "/carousel/gpu.png"
@@ -36,7 +36,7 @@ const items: itemsToShow[] = [
     },
     {
         id: 4,
-        name: "MotherBoard",
+        name: "Motherboard",
         description: "Buy the best MotherBoards from all around the country",
         buttonDetail: "Shop MotherBoard",
         image: "/carousel/motherboard.png"
@@ -85,7 +85,7 @@ const Carousel = () => {
                                     <div className="text-white text-6xl font-bold" >{item.name}</div>
                                     <div className="text-white text-xl mt-5">{item.description}</div>
                                     <div><button className="border-1 border-white text-black bg-[#e6e6e6] hover:text-white hover:bg-transparent transition-all px-3 py-2 text-xl font-bold rounded-sm hover: mt-5 cursor-pointer" onClick={()=> {
-                                        navigate(`/product/?category=laptop`)
+                                        navigate(`/product/?category=${item.name}`)
                                     }} >{item.buttonDetail}</button></div>
                                 </div>  
                             </div>

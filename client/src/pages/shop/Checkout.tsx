@@ -147,8 +147,8 @@ const Checkout = () => {
                         <div className="w-full bg-white px-4 py-6 shadow-sm rounded-md">
                             <div className="text-black font-semibold text-xl mb-4">Contact Information</div>
                             <div className="space-y-2">
-                                <div>Phone number</div>
-                                <div><input type="number" name='buyerContact' className="w-full border border-gray-300 px-3 py-1.5 rounded-md" placeholder="98XXXXXXXX" value={orderData[0].buyerContact} onChange={handleChange} maxLength={12} minLength={6} /></div>
+                                <div>Phone number <span className="text-xs font-semibold text-gray-700">(7 to 12 digits)*</span></div>
+                                <div><input type="number" name='buyerContact' className="w-full border border-gray-300 px-3 py-1.5 rounded-md" placeholder="98XXXXXXXX" value={orderData[0].buyerContact ?? 12345678} onChange={handleChange} maxLength={12} minLength={6} /></div>
                             </div>
                         </div>
                         <div className="w-full bg-white px-4 py-6 shadow-sm rounded-md">
@@ -175,7 +175,7 @@ const Checkout = () => {
                                     <div className="w-4 h-4 p-0.5 border border-gray-300 rounded-full">
                                         <div className="w-full h-full bg-blue-500 rounded-full"></div>
                                     </div>
-                                    <div>Esewa</div>
+                                    <div>Epay</div>
                                 </div>
                             </div>
                             <div>

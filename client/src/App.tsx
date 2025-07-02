@@ -20,7 +20,6 @@ import Setting from "./pages/commonComponents/Setting"
 import Orders from "./pages/admin/Orders"
 import Inventory from "./pages/admin/Inventory"
 import Users from "./pages/admin/Users"
-import Analytics from "./pages/admin/Analytics"
 import Categories from "./pages/admin/Categories"
 import Workers from "./pages/admin/Workers"
 import Overview from "./pages/admin/Overview"
@@ -108,10 +107,6 @@ const router = createBrowserRouter([
           {
             path: "workers",
             element: <Workers />
-          },
-          {
-            path: "analytic",
-            element: <Analytics />
           },
           {
             path: "category",

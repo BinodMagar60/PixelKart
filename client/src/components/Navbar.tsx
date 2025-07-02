@@ -1,10 +1,11 @@
-import { Heart, Home, LogOut, Package, Search, Settings, ShoppingCart, User } from "lucide-react"
+import { Heart, Home, LogOut, Package, Search, Settings, ShoppingBag, ShoppingCart, User } from "lucide-react"
 
 import { useEffect, useRef, useState } from "react"
 import { useUserContext } from "../context/UserContext"
 import { logoutUser } from "../api/LoginRegisterAPI"
 import { Link, useNavigate } from "react-router-dom"
-
+import { useProductContext } from "../context/ProductContext"
+import type { ProductType } from "../types/ProductType"
 
 type dropdown = {
     name: string,
@@ -15,6 +16,7 @@ type dropdown = {
 }
 
 const Navbar = () => {
+    const { products } = useProductContext()
     const { userInfo, setUserInfo } = useUserContext()
     const [isOpen, setOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -22,12 +24,12 @@ const Navbar = () => {
     const [dropdownData, setDropdownData] = useState<dropdown[]>([])
     const [searched, setSearched] = useState("")
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const [suggestedProduct, setSuggestedProduct] = useState<ProductType[]>([])
+    const [isSuggestionOpen, setSuggestionOpen] = useState(false)
 
     const Profile = () => {
         setOpen(prev => !prev)
     }
-
-
     const handleLogout = async () => {
         const response = await logoutUser('auth/users/logout')
         if (response.status === 400 || response.status === 500) {
@@ -60,6 +62,11 @@ const Navbar = () => {
                 link: "/account/profile"
             },
             {
+                name: "Purchase",
+                icon: <ShoppingBag size={15} strokeWidth={1.5} />,
+                link: "/account/mypurchase"
+            },
+            {
                 name: "Wishlist",
                 icon: <Heart size={15} strokeWidth={1.5} />,
                 link: "/account/wishlist"
@@ -88,6 +95,16 @@ const Navbar = () => {
                 link: "/account/overview"
             },
             {
+                name: "Orders",
+                icon: <ShoppingCart size={15} strokeWidth={1.5} />,
+                link: "/account/order"
+            },
+            {
+                name: "Inventory",
+                icon: <Package size={15} strokeWidth={1.5} />,
+                link: "/account/inventory"
+            },
+            {
                 name: "Setting",
                 icon: <Settings size={15} strokeWidth={1.5} />,
                 link: "/account/setting"
@@ -104,6 +121,11 @@ const Navbar = () => {
                 name: "Profile",
                 icon: <User size={15} strokeWidth={1.5} />,
                 link: "/account/profile"
+            },
+            {
+                name: "Orders",
+                icon: <ShoppingCart size={15} strokeWidth={1.5} />,
+                link: "/account/order"
             },
             {
                 name: "Inventory",
@@ -124,7 +146,6 @@ const Navbar = () => {
         ],
     }
 
-
     useEffect(() => {
         if (userInfo?.role === "User") {
             setDropdownData(dropdownoptions.user);
@@ -135,9 +156,23 @@ const Navbar = () => {
         }
     }, [userInfo]);
 
+    useEffect(() => {
+        if (searched !== "") {
+            setSuggestionOpen(true);
+            const newData = products.filter(item =>
+                item.productName.toLowerCase().includes(searched.toLowerCase()) ||
+                item.category.toLowerCase().includes(searched.toLowerCase())
+            );
+            setSuggestedProduct(newData);
+        } else {
+            setSuggestionOpen(false);
+            setSuggestedProduct([]);
+        }
+    }, [searched, products]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setSearched("")
         navigate(`/product/?q=${searched}`)
     }
 
@@ -148,9 +183,30 @@ const Navbar = () => {
                     <div className="flex h-full items-center gap-1 min-w-12"><img src="/logo.png" alt="PixelKart" className="h-10 w-10" /><span className="text-3xl font-bold hidden xl:block">PixelKart</span></div>
                 </Link>
                 <form onSubmit={handleSubmit} className="f-full max-w-150 w-full relative hidden lg:block">
-                    <span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]"><Search size={16} /></span>
-                    <input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 drop-shadow-sm rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" value={searched}  onChange={(e)=>(setSearched(e.target.value))}/>
-                    </form>
+                    <div>
+                        <span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]"><Search size={16} /></span>
+                        <input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 drop-shadow-sm rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" value={searched} onChange={(e) => {
+                            setSearched(e.target.value)
+
+                        }} />
+                    </div>
+                    {
+                        isSuggestionOpen && suggestedProduct && (
+                            <div className="w-full absolute rounded-md shadow p-1 bg-white mt-1">
+                                {
+                                    suggestedProduct.slice(0, 5).map(item => (
+                                        <div key={item.id} className="p-4 hover:bg-gray-100 rounded-md" onClick={() => {
+                                            navigate(`/product/${item.id}`)
+                                        }}>
+                                            {item.productName}
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        )
+                    }
+
+                </form>
                 <div className="flex gap-1 justify-end min-w-55 ">
                     {
                         !isSearchOpen && (
@@ -198,7 +254,7 @@ const Navbar = () => {
                                                                     {
                                                                         item.link ? (
                                                                             <Link to={`${item?.link}`}>
-                                                                                <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2 hover:bg-gray-100 transition text-sm ${item.style}`} onClick={item.action}>
+                                                                                <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2 hover:bg-gray-100 transition text-sm     ${item.style}`} onClick={item.action}>
                                                                                     <span>{item.icon}</span> <span>{item.name}</span>
                                                                                 </button>
                                                                             </Link>

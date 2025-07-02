@@ -2,16 +2,18 @@ import { useEffect, useState, type SetStateAction } from "react";
 import '../index.css'
 import { Check, ChevronDown } from "lucide-react";
 import { getcategory } from "../api/AccountAPI";
+import type { IFilter } from "../pages/shop/ProductPage";
 
 
 type propsTypes = {
     isFilterActive: boolean,
     setIsFilterActive: React.Dispatch<SetStateAction<boolean>>,
-    
+    filteringdata: IFilter,
+    setfilteringdata: React.Dispatch<React.SetStateAction<IFilter>>,
 }
 
 
-const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
+const FilterPanel = ({ isFilterActive, setIsFilterActive, filteringdata, setfilteringdata }: propsTypes) => {
 
     type categoryType = {
         id: string,
@@ -23,7 +25,7 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
 
     const [categoryes, setcategoryes] = useState<categoryType[]>([])
 
-    
+
 
     const conditions: conditionType[] = [
         "All",
@@ -33,18 +35,18 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
     ]
 
 
-    const maxPrice = 2000;
-    const [price, setPrice] = useState(maxPrice);
-    const [selectedCategory, setSelectedCategory] = useState("All")
+    const maxPrice = 1500000;
+    const [price, setPrice] = useState(filteringdata.price);
+    const [selectedCategory, setSelectedCategory] = useState(filteringdata.category)
     const [categoryOpen, setCategoryOpen] = useState(false)
-    const [selectedCondition, setSelectedCondition] = useState<conditionType>("All")
+    const [selectedCondition, setSelectedCondition] = useState<conditionType | string>(filteringdata.condition)
     const [conditionOpen, setConditionOpen] = useState(false)
 
-    useEffect(()=> {
-        const apicall = async() => { 
+    useEffect(() => {
+        const apicall = async () => {
             try {
                 const response = await getcategory("account/category")
-                const newdata =[{
+                const newdata = [{
                     id: 1,
                     categoryName: "All",
                     Product: 0,
@@ -55,7 +57,7 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
             }
         }
         apicall()
-    },[])
+    }, [])
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value, 10);
         if (!isNaN(value) && value <= maxPrice && value >= 0) {
@@ -65,11 +67,12 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
 
     const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPrice(parseInt(e.target.value, 10));
+        setfilteringdata(item => ({ ...item, price: parseInt(e.target.value, 10) }))
     };
 
     return (
         <div className={` h-full w-68 ${isFilterActive ? "mx-auto w-80 " : "relative hidden lg:block"}`}>
-            <div className={`bg-white shadow px-2 py-3 rounded-md space-y-2 sticky top-20 ${isFilterActive? "px-4":""}`}>
+            <div className={`bg-white shadow px-2 py-3 rounded-md space-y-2 sticky top-20 ${isFilterActive ? "px-4" : ""}`}>
                 <div className="font-semibold">Filters</div>
                 <div>Category</div>
                 <div>
@@ -90,6 +93,7 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
                                         onClick={() => {
                                             setSelectedCategory(option.categoryName);
                                             setCategoryOpen(false);
+                                            setfilteringdata(prev => ({ ...prev, category: option.categoryName }))
                                         }}
                                         className="p-0.5"
                                     >
@@ -122,6 +126,7 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
                                         onClick={() => {
                                             setSelectedCondition(option);
                                             setConditionOpen(false);
+                                            setfilteringdata(prev => ({ ...prev, condition: option }))
                                         }}
                                         className="p-0.5"
                                     >
@@ -163,12 +168,24 @@ const FilterPanel = ({ isFilterActive, setIsFilterActive }: propsTypes) => {
                 </div>
 
                 <div>
-                    <button className="w-full border p-2 rounded-md border-gray-300 font-semibold cursor-pointer hover:bg-gray-100 transition-all hover:shadow mt-4">
+                    <button className="w-full border p-2 rounded-md border-gray-300 font-semibold cursor-pointer hover:bg-gray-100 transition-all hover:shadow mt-4" onClick={() => {
+                        setfilteringdata({
+                            category: "All",
+                            condition: "All",
+                            sorting: "Highest Rated",
+                            price: 1500000,
+                        })
+                        setPrice(maxPrice)
+                        setSelectedCategory("All")
+                        setSelectedCondition("All")
+
+
+                    }}>
                         Clear Filters
                     </button>
                     {
                         isFilterActive && (
-                            <button className="w-full border p-2 rounded-md text-white bg-black font-semibold cursor-pointer hover:bg-gray-900 transition-all hover:shadow mt-4" onClick={()=>setIsFilterActive(false)}>
+                            <button className="w-full border p-2 rounded-md text-white bg-black font-semibold cursor-pointer hover:bg-gray-900 transition-all hover:shadow mt-4" onClick={() => setIsFilterActive(false)}>
                                 Close
                             </button>
                         )

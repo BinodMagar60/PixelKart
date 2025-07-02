@@ -1,4 +1,4 @@
-import { FolderTreeIcon, Heart, Home, LineChart, Menu, Package, Settings, ShoppingBag, ShoppingCart, Store, User, Users } from "lucide-react"
+import { FolderTreeIcon, Heart, Home, Menu, Package, Settings, ShoppingBag, ShoppingCart, Store, User, Users } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
@@ -88,11 +88,6 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                 name: "Categories",
                 icon: <FolderTreeIcon />,
                 link: "/account/category",
-            },
-            {
-                name: "Analytics",
-                icon: <LineChart />,
-                link: "/account/analytic",
             },
             {
                 name: "Setting",

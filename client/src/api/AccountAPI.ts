@@ -195,42 +195,44 @@ export const addReview = async (
   }
 };
 
-
 export const getReview = async (route: string) => {
   try {
     const response = await axios.get(URI + route, {
       withCredentials: true,
-    })
-    return response.data
+    });
+    return response.data;
   } catch (error) {
-    const err = error as AxiosError
-    return err?.response
+    const err = error as AxiosError;
+    return err?.response;
   }
-}
+};
 
-export const updateReview = async(route: string, data: {reviewId: string, reviewStar: number, reviewComment: string}) => {
+export const updateReview = async (
+  route: string,
+  data: { reviewId: string; reviewStar: number; reviewComment: string }
+) => {
   try {
-    const response = await axios.put(URI+route, data, {withCredentials:true})
-    return response.data
+    const response = await axios.put(URI + route, data, {
+      withCredentials: true,
+    });
+    return response.data;
   } catch (error) {
-    const err = error as AxiosError
-    return err?.response
+    const err = error as AxiosError;
+    return err?.response;
   }
-}
+};
 
-
-export const deleteReview = async(route: string) => {
+export const deleteReview = async (route: string) => {
   try {
     const response = await axios.delete(URI + route, {
-      withCredentials: true
-    })
-    return response.data
+      withCredentials: true,
+    });
+    return response.data;
   } catch (error) {
-    const err = error as AxiosError
-    return err?.response
+    const err = error as AxiosError;
+    return err?.response;
   }
-}
-
+};
 
 //Orders
 export const getOrdersAdmin = async (route: string) => {
@@ -251,6 +253,33 @@ export const updateOrderStatus = async (
 ) => {
   try {
     const response = await axios.put(URI + route, data, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return err?.response;
+  }
+};
+
+//Overview(admin)
+
+export const getOverViewDetails = async () => {
+  try {
+    const response = await axios.get(URI + "account/overview", {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return err?.response;
+  }
+};
+
+
+export const getDashboardDetails = async () => {
+  try {
+    const response = await axios.get(URI + "account/dashboard", {
       withCredentials: true,
     });
     return response.data;

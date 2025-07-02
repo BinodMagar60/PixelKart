@@ -1,10 +1,11 @@
 import { AlertTriangle, DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { getOverViewDetails } from "../../api/AccountAPI";
 
 
 
 interface OrdersTypes {
-    id: number,
+    id: string,
     order: string,
     name: string,
     price: number,
@@ -12,17 +13,18 @@ interface OrdersTypes {
 }
 
 interface AlertsTypes {
-    id: number,
+    id: string,
     name: string,
     number: number,
 }
 
 const Overview = () => {
-    const [totalUsers, setTotalUsers] = useState(320);
-    const [totalProducts, setTotalProducts] = useState(120);
-    const [totalSales, setTotalSales] = useState(8250);
-    const [totalOrders, setTotalOrders] = useState(240);
-
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [totalSales, setTotalSales] = useState(0);
+    const [totalOrders, setTotalOrders] = useState(0);
+    const [RecentOrders, setRecentOrders] = useState<OrdersTypes[]>([])
+    const [stockAlerts, setstockAlerts] = useState<AlertsTypes[]>([])
     const [animatedValues, setAnimatedValues] = useState({
         users: 0,
         products: 0,
@@ -51,6 +53,23 @@ const Overview = () => {
         };
         animationRefs.current[key] = requestAnimationFrame(step);
     };
+
+    useEffect(()=> {
+        const callAPI = async() => {
+            try {
+                const response = await getOverViewDetails()
+                setTotalUsers(response.data.totalUsers)
+                setTotalProducts(response.data.totalProducts)
+                setTotalSales(response.data.totalSales)
+                setTotalOrders(response.data.totalOrders)
+                setRecentOrders(response.data.recentOrders)
+                setstockAlerts(response.data.systemAlerts)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        callAPI()
+    },[])
 
     useEffect(() => {
         animateValue("users", totalUsers);
@@ -96,77 +115,7 @@ const Overview = () => {
         },
     ];
 
-    const RecentOrders: OrdersTypes[] = [
-        {
-            id: 1,
-            order: "#Order-001",
-            name: "Binod magar",
-            price: 1200,
-            status: "Processing",
-        },
-        {
-            id: 2,
-            order: "#Order-002",
-            name: "John Doe",
-            price: 1220,
-            status: "Shipped",
-        },
-        {
-            id: 3,
-            order: "#Order-003",
-            name: "Binod magar",
-            price: 120,
-            status: "Processing",
-        },
-        {
-            id: 4,
-            order: "#Order-004",
-            name: "Binod magar",
-            price: 700,
-            status: "Shipped",
-        }, {
-            id: 5,
-            order: "#Order-005",
-            name: "Binod magar",
-            price: 350,
-            status: "Delivered",
-        },
-    ]
-
-    const stockAlerts: AlertsTypes[] = [
-        {
-            id: 1,
-            name: "HeadPhones",
-            number: 5,
-        },
-        {
-            id: 2,
-            name: "Laptop",
-            number: 7,
-        },
-        {
-            id: 3,
-            name: "Monitor",
-            number: 1,
-        },
-        {
-            id: 4,
-            name: "Pc",
-            number: 3,
-        },
-        {
-            id: 5,
-            name: "Motherboard",
-            number: 11,
-        },
-        {
-            id: 6,
-            name: "GPU",
-            number: 0,
-        },
-    ]
-
-
+    
 
     const sortedStockAlert = [...(stockAlerts.filter(item => item.number < 11))].sort((a, b) => a.number - b.number)
 
@@ -192,7 +141,7 @@ const Overview = () => {
                         <div className="text-xl font-semibold">Recent Orders</div>
                         <div className="text-gray-600 text-sm">Latest customer orders</div>
                     </div>
-                    <div className="flex flex-col gap-2 max-h-140 overflow-y-auto overflow-hidden" style={{
+                    <div className="flex flex-col gap-2 max-h-100 overflow-y-auto overflow-hidden" style={{
                         scrollbarWidth: "none"
                     }}>
                         {
@@ -203,7 +152,7 @@ const Overview = () => {
                             ) :
                                 (
                                     RecentOrders.map((item, index) => (
-                                        <div className="flex justify-between p-3 bg-gray-100 rounded-md" key={index}>
+                                        <div className="flex justify-between p-3  bg-gray-100 rounded-md" key={index}>
                                             <div className="leading-7">
                                                 <div>{item.order}</div>
                                                 <div className="text-sm text-gray-600">{item.name}</div>
@@ -226,7 +175,7 @@ const Overview = () => {
                         <div className="text-xl font-semibold">System Alerts</div>
                         <div className="text-gray-600 text-sm">Latest customer orders</div>
                     </div>
-                    <div className="flex flex-col gap-2 max-h-140 overflow-y-auto overflow-hidden" style={{
+                    <div className="flex flex-col gap-2 max-h-100 overflow-y-auto overflow-hidden" style={{
                         scrollbarWidth: "none"
                     }}>
                         {
@@ -243,7 +192,7 @@ const Overview = () => {
                                             <div className={`${item.number < 4 ? "text-red-600" : "text-yellow-600"}`}>
                                                 <AlertTriangle size={30} />
                                             </div>
-                                            <div className="leading-6 ml-4">
+                                            <div className="leading-7 ml-4">
                                                 <div className="font-semibold">{item.name}'s Low Stock Alert</div>
                                                 <div className="text-sm text-gray-600">{item.number} item left on inventory</div>
                                             </div>

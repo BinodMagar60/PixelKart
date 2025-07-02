@@ -288,17 +288,20 @@ router.get("/inventory", authHandler, async (req, res) => {
       const allData = await Product.find({
         role: { $in: ["Admin", "Worker"] },
       }).sort({ createdAt: -1 });
-      const safeData = allData.map((item) => ({
+      const safeData = await Promise.all(allData.map(async(item) => {
+        const orders = await Order.find({productId: item._id, status: { $nin: ["Cart","Cancelled"]}})
+        return {
         id: item._id,
         productName: item.productName,
         category: item.category,
         price: item.price,
         originalPrice: item.originalPrice,
         stock: item.qty,
-        sales: 0,
+        sales: orders.length,
         featured: item.featured,
         condition: item.condition,
-      }));
+      }
+      }))
 
       res.status(200).json({ message: "Data sent", safeData });
     } else {
@@ -544,12 +547,8 @@ router.get("/review/:orderId", authHandler, async (req, res) => {
 router.put("/review", authHandler, async (req, res) => {
   try {
     const { reviewId, reviewStar, reviewComment } = req.body;
-    console.log(reviewStar)
-    if (
-      !reviewId ||
-      !reviewComment ||
-      typeof reviewStar !== "number"
-    ) {
+    console.log(reviewStar);
+    if (!reviewId || !reviewComment || typeof reviewStar !== "number") {
       res.status(400).json({ message: "Missing field" });
       return;
     }
@@ -563,25 +562,25 @@ router.put("/review", authHandler, async (req, res) => {
       res.status(400).json({ message: "Failed to update review" });
       return;
     }
-    res.status(200).json({message: "Update successfull", data: newdata})
+    res.status(200).json({ message: "Update successfull", data: newdata });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 });
 
-router.delete('/review/:id', authHandler, async(req, res)=> {
+router.delete("/review/:id", authHandler, async (req, res) => {
   try {
-    const {id} = req.params
-    const deletedData = await Review.findByIdAndDelete(id)
-    if(!deletedData){
-      res.status(400).json({message: "Fail to delete review"})
-      return
+    const { id } = req.params;
+    const deletedData = await Review.findByIdAndDelete(id);
+    if (!deletedData) {
+      res.status(400).json({ message: "Fail to delete review" });
+      return;
     }
-    res.status(200).json({message: "Review deleted", data: deletedData})
+    res.status(200).json({ message: "Review deleted", data: deletedData });
   } catch (error) {
-    res.status(500).json({message: "Server error", error})
+    res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
 //Orders
 router.get("/order", authHandler, async (req, res) => {
@@ -717,5 +716,135 @@ router.put("/changeproductstatus", authHandler, async (req, res) => {
     res.status(200).json({ message: `Order ${updatedData?.status}` });
   } catch (error) {}
 });
+
+//Overview section (admin)
+router.get("/overview", authHandler, async (req, res) => {
+  try {
+    const Users = await User.find();
+    const Products = await Product.find({ role: { $nin: "User" } }).sort({
+      qty: -1,
+    });
+    const Orders = await Order.find({
+      status: { $nin: ["Cart", "Cancelled"] },
+    }).sort({ createdAt: -1 });
+    const Money = await Order.find({
+      status: { $nin: ["Cart", "Ordered", "Cancelled"] },
+    });
+
+    const adminOnlyOrders = (
+      await Promise.all(
+        Orders.map(async (item) => {
+          const userDetail = await User.findOne({ _id: item.sellerId });
+          if (userDetail.role !== "User") {
+            return item;
+          }
+          return null;
+        })
+      )
+    ).filter((item) => item != null);
+
+    const adminOnlyMoney = (
+      await Promise.all(
+        Money.map(async (item) => {
+          const userDetail = await User.findOne({ _id: item.sellerId });
+          if (userDetail.role !== "User") {
+            return item;
+          }
+          return null;
+        })
+      )
+    ).filter((item) => item !== null);
+
+    const totalUsers = Users.length;
+    const totalProducts = Products.length;
+    let totalSales = 0;
+    adminOnlyMoney.forEach((item) => {
+      totalSales += item.price || 0;
+    });
+    const totalOrders = adminOnlyOrders.length;
+    const recentOrders = await Promise.all(
+      adminOnlyOrders.slice(0, 10).map(async (item) => {
+        const productData = await Product.findOne({ _id: item.productId });
+        const userData = await User.findOne({ _id: item.buyerId });
+
+        return {
+          id: productData?.productName,
+          order: item.orderNumber,
+          name: `${userData.firstName}${
+            userData.secondName ? " " + userData.secondName : ""
+          }`,
+          price: item.price,
+          status: item.status,
+        };
+      })
+    );
+
+    const systemAlerts = Products.filter((item) => {
+      item.qty <= 10;
+    }).slice(0, 10).map(item => {
+      return {
+        id: item._id,
+        name: item.productName,
+        number: item.qty,
+      }
+    });
+
+    const fullData = {
+      totalUsers,
+      totalProducts,
+      totalSales,
+      totalOrders,
+      recentOrders,
+      systemAlerts,
+    };
+
+    res.status(200).json({ message: "Data received", data: fullData });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+//dashboard
+router.get('/dashboard', authHandler, async(req, res) => {
+  try {
+    const userDetail = (req as any).user
+    const Products = await Product.find({poster: userDetail._id}).sort({createdAt: -1}) //listed items
+    const Purchases = await Order.find({buyerId: userDetail._id, status: { $nin: ["Cart", "Cancelled"]}}).sort({updatedAt: -1})
+    const Sold = await Order.find({sellerId: userDetail._id, status: { $nin: ["Cart","Cancelled"]}}).sort({createdAt: -1})
+    const Wishlists = await Product.find({userWishlist: userDetail._id})
+    const recentPurchases = (await Promise.all(Purchases.map(async(item) => {
+      const productDetail = await Product.findOne({_id: item.productId})
+      return {
+        id: item._id,
+        name: productDetail?.productName,
+        orderedData: item.orderData,
+        status: item.status
+      }
+    }))).slice(0,10)
+    const activeListings = Products.map( item => {
+      return {
+        id: item._id,
+        name: item.productName,
+        qty: item.qty,
+        price: item.price,
+      }
+    }).slice(0,10)
+
+    const finalData = {
+      totalItemsForSales: Products.length,
+      totalItemPurchased: Purchases.length,
+      totalItemSold: Sold.length,
+      totalItemWishlisted: Wishlists.length,
+      recentPurchasesData: recentPurchases,
+      activeItemListing: activeListings,
+    }
+
+    res.status(200).json({message: "Data received", data:finalData})
+
+  } catch (error) {
+    res.status(500).json({message: "Server error", error})
+  }
+})
 
 export default router;
