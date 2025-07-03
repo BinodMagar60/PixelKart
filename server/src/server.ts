@@ -23,9 +23,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-
-
-
 app.use("/auth/users", LoginSingnup )
 app.use("/account", Account)
 app.use("/product", Product)
