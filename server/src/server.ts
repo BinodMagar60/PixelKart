@@ -15,7 +15,7 @@ app.use(cookieParser())
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "";
 
-const servers = ["http://localhost:5173","http://localhost:5174","http://localhost:5175"]
+const servers = process.env.ORIGIN
 
 app.use(cors({
   origin: servers,
