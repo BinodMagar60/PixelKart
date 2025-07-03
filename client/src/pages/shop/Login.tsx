@@ -57,7 +57,7 @@ const Login = () => {
       setUserInfo(response?.data)
       setTimeout(() => {
         navigate('/')
-        window.location.reload()
+        // window.location.reload()
       }, 1000);
     }
     catch (error) {
