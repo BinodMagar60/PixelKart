@@ -6,6 +6,8 @@ const URL = URI + "product/"
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 
+console.log(URL)
+
 export const addCategorySchema = z.object({
     category: z.string().min(2, "Minimum length required is 2")
 })
