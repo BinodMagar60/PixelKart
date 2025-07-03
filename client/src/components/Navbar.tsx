@@ -254,7 +254,8 @@ const Navbar = () => {
                                                                     {
                                                                         item.link ? (
                                                                             <Link to={`${item?.link}`}>
-                                                                                <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2 hover:bg-gray-100 transition text-sm     ${item.style}`} onClick={item.action}>
+                                                                                <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2
+                                                                                    border hover:bg-gray-100 transition text-sm     ${item.style}`} onClick={item.action}>
                                                                                     <span>{item.icon}</span> <span>{item.name}</span>
                                                                                 </button>
                                                                             </Link>

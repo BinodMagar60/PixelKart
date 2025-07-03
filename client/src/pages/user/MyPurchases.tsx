@@ -189,7 +189,7 @@ interface IReview {
 
 const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel, change, setchange, setSelectedProduct }: MyOrderListTypes) => {
     const navigate = useNavigate()
-
+    const {setApiChange} = useProductContext()
     const [reviewComment, setReviewComment] = useState("")
     const [reviewStar, setReviewStar] = useState<number>(0)
     const [reviewData, setReviewData] = useState<IReview | null>(null)
@@ -201,7 +201,7 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel, change, set
                 setReviewData(response.data)
                 setReviewComment(response.data.reviewComment)
                 setReviewStar(response.data.reviewStar)
-
+                
             } catch (error) {
                 console.log(error)
             }
@@ -235,7 +235,7 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel, change, set
                 theme: 'light   '
             })
             setchange(prev => !prev)
-
+            setApiChange(prev => !prev)
             setSelectedProduct(item => ({ ...item, isReviewed: true }))
         } catch (error) {
             console.log(error)
@@ -265,6 +265,8 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel, change, set
                 theme: 'light   '
             })
             setchange(prev => !prev)
+            setApiChange(prev => !prev)
+
         } catch (error) {
             console.log(error)
         }
@@ -291,6 +293,8 @@ const MyOrderList = ({ setOpenDetail, selectedProduct, handleCancel, change, set
             setReviewStar(0)
             setReviewComment("")
             setSelectedProduct(item => ({ ...item, isReviewed: false }))
+            setApiChange(prev => !prev)
+
         } catch (error) {
             console.log(error)
         }

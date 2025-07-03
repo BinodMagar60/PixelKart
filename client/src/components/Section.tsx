@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import Card from "./Card"
 import { useProductContext } from "../context/ProductContext"
 import { useNavigate } from "react-router-dom"
