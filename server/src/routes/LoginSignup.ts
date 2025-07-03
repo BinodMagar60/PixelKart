@@ -53,7 +53,8 @@ router.post("/register", async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
+      secure: true,
       maxAge: 30 * 1000 * 60 * 60 * 24,
     });
 
@@ -137,7 +138,11 @@ router.get("/userinfo", authHandler, async (req: Request, res: Response) => {
 
 router.get("/logout", authHandler, async (req, res) => {
   try {
-    res.cookie("token", null);
+    res.cookie("token", "", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
 
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
