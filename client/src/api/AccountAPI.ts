@@ -20,7 +20,9 @@ export const updateUserProfile = async (
   data: userProfileType
 ) => {
   try {
-    const response = await axios.put(URI + route, data);
+    const response = await axios.put(URI + route, data,{
+            withCredentials: true
+        });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -54,7 +56,9 @@ export const resetpasswordAPI = async (route: string, data: { id: string }) => {
 
 export const addworker = async (route: string, data: workeraddtype) => {
   try {
-    const response = await axios.post(URI + route, data);
+    const response = await axios.post(URI + route, data,{
+            withCredentials: true
+        });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -64,7 +68,7 @@ export const addworker = async (route: string, data: workeraddtype) => {
 
 export const deleteworker = async (route: string, data: { id: string }) => {
   try {
-    const response = await axios.delete(URI + route, { data: data });
+    const response = await axios.delete(URI + route, { data: data, withCredentials: true});
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -74,7 +78,9 @@ export const deleteworker = async (route: string, data: { id: string }) => {
 
 export const getallusers = async (route: string) => {
   try {
-    const response = await axios.get(URI + route);
+    const response = await axios.get(URI + route,{
+            withCredentials: true
+        });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -86,7 +92,9 @@ export const getallusers = async (route: string) => {
 
 export const getcategory = async (route: string) => {
   try {
-    const response = await axios.get(URI + route);
+    const response = await axios.get(URI + route,{
+            withCredentials: true
+        });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -96,7 +104,9 @@ export const getcategory = async (route: string) => {
 
 export const deletecategory = async (route: string, data: { id: string }) => {
   try {
-    const response = await axios.delete(URI + route, { data: data });
+    const response = await axios.delete(URI + route, { data: data,
+      withCredentials: true
+     });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -120,7 +130,9 @@ export const getinventory = async (route: string) => {
 
 export const updateinventory = async (route: string, data: productTypes) => {
   try {
-    const response = await axios.put(URI + route, data);
+    const response = await axios.put(URI + route, data,{
+            withCredentials: true
+        });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -130,7 +142,9 @@ export const updateinventory = async (route: string, data: productTypes) => {
 
 export const deleteproduct = async (route: string, data: { id: string }) => {
   try {
-    const response = await axios.delete(URI + route, { data: data });
+    const response = await axios.delete(URI + route, { data: data,
+      withCredentials:true
+     });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;

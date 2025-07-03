@@ -17,7 +17,9 @@ export type addcategoryType = z.infer<typeof addCategorySchema>
 
 export const addNewCategory = async(route: string, data: addcategoryType) => {
     try{
-        const response = await axios.post(URL+route, data)
+        const response = await axios.post(URL+route, data,{
+            withCredentials: true
+        })
         return response.data
     }
     catch(error){
@@ -30,7 +32,9 @@ export const addNewCategory = async(route: string, data: addcategoryType) => {
 
 export const getCategoriesFields = async() => {
     try{
-        const response = await axios.get(`${URL}categories`)
+        const response = await axios.get(`${URL}categories`,{
+            withCredentials: true
+        })
         return response.data
     }
     catch(error){
@@ -42,7 +46,9 @@ export const getCategoriesFields = async() => {
 
 export const addnewproduct = async(route: string, data:unknown) => {
     try{
-        const response = await axios.post(URL+route, data)
+        const response = await axios.post(URL+route, data,{
+            withCredentials: true
+        })
         return response.data
     }
     catch(error){
@@ -53,7 +59,9 @@ export const addnewproduct = async(route: string, data:unknown) => {
 
 export const getProductReviews = async(route: string) => {
     try{
-        const response = await axios.get(URL+route)
+        const response = await axios.get(URL+route,{
+            withCredentials: true
+        })
         return response.data
     }
     catch(error){
@@ -74,7 +82,9 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
       formData
-    );
+    ,{
+            withCredentials: true
+        });
 
     return response.data.secure_url; 
   } catch (err: any) {
@@ -127,7 +137,7 @@ export const addToCart = async(route: string, data: { productId: string}) => {
 
 export const removeCart = async(route: string, data: {id: string}) => {
     try {
-        const response = await axios.delete(URL + route, {data})
+        const response = await axios.delete(URL + route, {data, withCredentials: true})
         return response.data
     } catch (error) {
         const err = error as AxiosError
