@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "";
 
 const servers = process.env.ORIGIN
+console.log(servers)
 
 app.use(cors({
   origin: servers,
