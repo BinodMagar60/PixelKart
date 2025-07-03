@@ -17,7 +17,7 @@ type dropdown = {
 
 const Navbar = () => {
     const { products } = useProductContext()
-    const { userInfo, setUserInfo } = useUserContext()
+    const { userInfo, setUserInfo, setUserInfoChange } = useUserContext()
     const [isOpen, setOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const navigate = useNavigate();
@@ -33,11 +33,11 @@ const Navbar = () => {
     const handleLogout = async () => {
         const response = await logoutUser('auth/users/logout')
         if (response.status === 400 || response.status === 500) {
-
             return
         }
 
         setUserInfo(null)
+        setUserInfoChange(prev => !prev)
     }
 
 
@@ -255,7 +255,7 @@ const Navbar = () => {
                                                                         item.link ? (
                                                                             <Link to={`${item?.link}`}>
                                                                                 <button className={`flex gap-2 items-center cursor-pointer px-3 w-full bg-white h-full py-2
-                                                                                    border hover:bg-gray-100 transition text-sm     ${item.style}`} onClick={item.action}>
+                                                                                     hover:bg-gray-100 transition text-sm     ${item.style}`} onClick={item.action}>
                                                                                     <span>{item.icon}</span> <span>{item.name}</span>
                                                                                 </button>
                                                                             </Link>

@@ -88,11 +88,6 @@ const Sidebar = ({ menuButton, setMenuButton, setTitle }: SidebarProps) => {
                 name: "Categories",
                 icon: <FolderTreeIcon />,
                 link: "/account/category",
-            },
-            {
-                name: "Setting",
-                icon: <Settings />,
-                link: "/account/setting",
             }
         ],
         workerSidebar: [

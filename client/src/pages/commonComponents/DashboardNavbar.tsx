@@ -10,7 +10,7 @@ interface SidebarProps {
 }
 
 const DashboardNavbar = ({ menuButton, title }: SidebarProps) => {
-  const { userInfo, setUserInfo } = useUserContext()
+  const { userInfo, setUserInfo, setUserInfoChange } = useUserContext()
   const navigate = useNavigate()
   const [isOpen, setOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -34,6 +34,7 @@ const DashboardNavbar = ({ menuButton, title }: SidebarProps) => {
       return
     }
     setUserInfo(null)
+    setUserInfoChange(prev => !prev)
     setTimeout(() => {
       navigate("/")
     }, 1000);

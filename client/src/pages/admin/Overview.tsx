@@ -64,6 +64,7 @@ const Overview = () => {
                 setTotalOrders(response.data.totalOrders)
                 setRecentOrders(response.data.recentOrders)
                 setstockAlerts(response.data.systemAlerts)
+                console.log(response.data.systemAlerts)
             } catch (error) {
                 console.log(error)
             }

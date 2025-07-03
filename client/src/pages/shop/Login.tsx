@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { useUserContext } from "../../context/UserContext"
 import Logout from "../../components/Logout"
 const Login = () => {
-  const { userInfo, setUserInfo } = useUserContext()
+  const { userInfo, setUserInfo, setUserInfoChange } = useUserContext()
 
   useEffect(()=>{
     if(userInfo){
@@ -55,16 +55,15 @@ const Login = () => {
         return
       }
       setUserInfo(response?.data)
+      setUserInfoChange(prev => !prev)
       setTimeout(() => {
         navigate('/')
         // window.location.reload()
+        setLoading(false)
       }, 1000);
     }
     catch (error) {
       console.log(error)
-    }
-    finally {
-        setLoading(false)
     }
   }
 
@@ -102,7 +101,7 @@ const Login = () => {
         </form>
       </div>
       {
-        userInfo && <Logout/>
+        !loading && userInfo && <Logout/>
       }
     </div>
   )

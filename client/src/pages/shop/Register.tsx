@@ -7,15 +7,15 @@ import { useUserContext } from "../../context/UserContext";
 import Logout from "../../components/Logout";
 
 
-
 const Register = () => {
+
   const navigate = useNavigate()
-  const { userInfo, setUserInfo} = useUserContext()
-  useEffect(()=>{
-      if(userInfo){
-        navigate('/')
-      }
-    },[])
+  const { userInfo, setUserInfo, setUserInfoChange } = useUserContext()
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/')
+    }
+  }, [])
   const [loading, setLoading] = useState(false)
   const [userData, setUserData] = useState({
     firstName: "",
@@ -70,7 +70,7 @@ const Register = () => {
     const { name, value } = e.target
     setUserData(prev => ({
       ...prev,
-      [name]: name === 'email'? value.toLowerCase() : value
+      [name]: name === 'email' ? value.toLowerCase() : value
     }))
   }
 
@@ -152,24 +152,25 @@ const Register = () => {
           password: "",
           cPassword: "",
         })
-        
+
         toast.success(response.message, {
           theme: "light",
           autoClose: 1000,
         })
-        
+        setUserInfo(response.user)
+
+        setUserInfoChange(prev => !prev)
+
         setTimeout(() => {
           navigate("/")
-          setUserInfo(response.user)
-          window.location.reload()
+          // window.location.reload()
+          setLoading(false)
         }, 1000);
       }
       catch (error) {
         console.log(error)
       }
-      finally {
-        setLoading(false)
-      }
+      
     }
   }
 
@@ -178,7 +179,7 @@ const Register = () => {
     <div className="w-full min-h-screen flex justify-center pt-16 pb-10">
       <div className="min-w-64 max-w-110 w-full text-gray-600">
         <div>
-          <button className="flex justify-center items-center gap-2 hover:text-gray-950" onClick={()=>(navigate('/'))}>
+          <button className="flex justify-center items-center gap-2 hover:text-gray-950" onClick={() => (navigate('/'))}>
             <ArrowLeft size={18} />
             <span>Back to PixelKart</span>
           </button>
@@ -343,7 +344,7 @@ const Register = () => {
               <div className="select-none border-t-1 border-gray-300 my-2"></div>
               <div className="select-none mt-4">
                 Already have an account?{" "}
-                <span className="select-none text-blue-600 hover:text-blue-700 cursor-pointer" onClick={()=>(navigate("/login"))}>
+                <span className="select-none text-blue-600 hover:text-blue-700 cursor-pointer" onClick={() => (navigate("/login"))}>
                   Sign in
                 </span>
               </div>
@@ -352,7 +353,7 @@ const Register = () => {
         </div>
       </div>
       {
-        userInfo && <Logout/>
+        !loading && userInfo && <Logout />
       }
     </div>
   );

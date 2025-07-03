@@ -288,20 +288,25 @@ router.get("/inventory", authHandler, async (req, res) => {
       const allData = await Product.find({
         role: { $in: ["Admin", "Worker"] },
       }).sort({ createdAt: -1 });
-      const safeData = await Promise.all(allData.map(async(item) => {
-        const orders = await Order.find({productId: item._id, status: { $nin: ["Cart","Cancelled"]}})
-        return {
-        id: item._id,
-        productName: item.productName,
-        category: item.category,
-        price: item.price,
-        originalPrice: item.originalPrice,
-        stock: item.qty,
-        sales: orders.length,
-        featured: item.featured,
-        condition: item.condition,
-      }
-      }))
+      const safeData = await Promise.all(
+        allData.map(async (item) => {
+          const orders = await Order.find({
+            productId: item._id,
+            status: { $nin: ["Cart", "Cancelled"] },
+          });
+          return {
+            id: item._id,
+            productName: item.productName,
+            category: item.category,
+            price: item.price,
+            originalPrice: item.originalPrice,
+            stock: item.qty,
+            sales: orders.length,
+            featured: item.featured,
+            condition: item.condition,
+          };
+        })
+      );
 
       res.status(200).json({ message: "Data sent", safeData });
     } else {
@@ -724,6 +729,7 @@ router.get("/overview", authHandler, async (req, res) => {
     const Products = await Product.find({ role: { $nin: "User" } }).sort({
       qty: -1,
     });
+
     const Orders = await Order.find({
       status: { $nin: ["Cart", "Cancelled"] },
     }).sort({ createdAt: -1 });
@@ -779,16 +785,17 @@ router.get("/overview", authHandler, async (req, res) => {
       })
     );
 
-    const systemAlerts = Products.filter((item) => {
-      item.qty <= 10;
-    }).slice(0, 10).map(item => {
-      return {
-        id: item._id,
-        name: item.productName,
-        number: item.qty,
+    const systemAlerts = (Products.map((item) => {
+      if (item.qty <= 10) {
+        console.log("hello");
+        return {
+          id: item._id,
+          name: item.productName,
+          number: item.qty,
+        };
       }
-    });
-
+      return null
+    })).filter(item => item !== null)
     const fullData = {
       totalUsers,
       totalProducts,
@@ -804,32 +811,43 @@ router.get("/overview", authHandler, async (req, res) => {
   }
 });
 
-
 //dashboard
-router.get('/dashboard', authHandler, async(req, res) => {
+router.get("/dashboard", authHandler, async (req, res) => {
   try {
-    const userDetail = (req as any).user
-    const Products = await Product.find({poster: userDetail._id}).sort({createdAt: -1}) //listed items
-    const Purchases = await Order.find({buyerId: userDetail._id, status: { $nin: ["Cart", "Cancelled"]}}).sort({updatedAt: -1})
-    const Sold = await Order.find({sellerId: userDetail._id, status: { $nin: ["Cart","Cancelled"]}}).sort({createdAt: -1})
-    const Wishlists = await Product.find({userWishlist: userDetail._id})
-    const recentPurchases = (await Promise.all(Purchases.map(async(item) => {
-      const productDetail = await Product.findOne({_id: item.productId})
-      return {
-        id: item._id,
-        name: productDetail?.productName,
-        orderedData: item.orderData,
-        status: item.status
-      }
-    }))).slice(0,10)
-    const activeListings = Products.map( item => {
+    const userDetail = (req as any).user;
+    const Products = await Product.find({ poster: userDetail._id }).sort({
+      createdAt: -1,
+    }); //listed items
+    const Purchases = await Order.find({
+      buyerId: userDetail._id,
+      status: { $nin: ["Cart", "Cancelled"] },
+    }).sort({ updatedAt: -1 });
+    const Sold = await Order.find({
+      sellerId: userDetail._id,
+      status: { $nin: ["Cart", "Cancelled"] },
+    }).sort({ createdAt: -1 });
+    const Wishlists = await Product.find({ userWishlist: userDetail._id });
+    const recentPurchases = (
+      await Promise.all(
+        Purchases.map(async (item) => {
+          const productDetail = await Product.findOne({ _id: item.productId });
+          return {
+            id: item._id,
+            name: productDetail?.productName,
+            orderedData: item.orderData,
+            status: item.status,
+          };
+        })
+      )
+    ).slice(0, 10);
+    const activeListings = Products.map((item) => {
       return {
         id: item._id,
         name: item.productName,
         qty: item.qty,
         price: item.price,
-      }
-    }).slice(0,10)
+      };
+    }).slice(0, 10);
 
     const finalData = {
       totalItemsForSales: Products.length,
@@ -838,13 +856,12 @@ router.get('/dashboard', authHandler, async(req, res) => {
       totalItemWishlisted: Wishlists.length,
       recentPurchasesData: recentPurchases,
       activeItemListing: activeListings,
-    }
+    };
 
-    res.status(200).json({message: "Data received", data:finalData})
-
+    res.status(200).json({ message: "Data received", data: finalData });
   } catch (error) {
-    res.status(500).json({message: "Server error", error})
+    res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
 export default router;
