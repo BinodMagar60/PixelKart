@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
+const URI = import.meta.env.VITE_API_URL
 
 
 
@@ -37,7 +37,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         const apiCall = async()=> {
             setUserLoading(true)
             try{
-                const response = await axios.get(`http://localhost:5000/auth/users/userinfo`,{
+                const response = await axios.get(`${URI}auth/users/userinfo`,{
                     withCredentials: true
                 })
                 if(response?.status === 400 || response?.status === 500){

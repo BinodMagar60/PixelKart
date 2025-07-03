@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ProductContextType, ProductType } from "../types/ProductType";
+const URI = import.meta.env.VITE_API_URL
 import axios from "axios";
 
 
@@ -42,7 +43,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
     const apiCall = async () => {
       try {
         setProductLoading(true)
-        const response = await axios.get('http://localhost:5000/product/allproducts')
+        const response = await axios.get(`${URI}product/allproducts`)
         setProducts(response.data.data)
       }
       catch (error) {
