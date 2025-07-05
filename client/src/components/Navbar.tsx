@@ -185,14 +185,14 @@ const Navbar = () => {
                 <form onSubmit={handleSubmit} className="f-full max-w-150 w-full relative hidden lg:block">
                     <div>
                         <span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]"><Search size={16} /></span>
-                        <input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 drop-shadow-sm rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" value={searched} onChange={(e) => {
+                        <input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" value={searched} onChange={(e) => {
                             setSearched(e.target.value)
 
                         }} />
                     </div>
                     {
                         isSuggestionOpen && suggestedProduct && (
-                            <div className="w-full absolute rounded-md shadow p-1 bg-white mt-1">
+                            <div className="w-full absolute rounded-md shadow p-1 bg-white mt-1 hidden lg:block">
                                 {
                                     suggestedProduct.slice(0, 5).map(item => (
                                         <div key={item.id} className="p-4 hover:bg-gray-100 rounded-md" onClick={() => {
@@ -280,14 +280,51 @@ const Navbar = () => {
 
                 </div>
             </div>
-            {
-                isSearchOpen && (
-                    <div className="w-full pb-2 flex gap-2">
-                        <div className=" w-full relative lg:hidden"><span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]"><Search size={16} /></span><input type="text" placeholder="Search for the computers, laptops, parts..." className="border-1 py-2 w-full h-full border-gray-300 drop-shadow-sm rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm" /></div>
-                        <button className="border px-3 py-1 border-gray-300 cursor-pointer rounded-md hover:bg-gray-100" onClick={() => setIsSearchOpen(false)}>Close</button>
-                    </div>
-                )
-            }
+           {
+    isSearchOpen && (
+        <form onSubmit={handleSubmit} className="w-full pb-2 flex gap-2">
+            <div className="w-full relative lg:hidden">
+                <span className="text-gray-400 absolute left-2 top-[50%] translate-y-[-50%]">
+                    <Search size={16} />
+                </span>
+                <input
+                    type="text"
+                    placeholder="Search for the computers, laptops, parts..."
+                    className="border-1 py-2 w-full h-full border-gray-300 rounded-sm pl-8 pr-2 placeholder:text-gray-400 text-gray-700 focus:shadow-sm"
+                    value={searched}
+                    onChange={(e) => {
+                        setSearched(e.target.value)
+                    }}
+                />
+                 {
+                        isSuggestionOpen && suggestedProduct && (
+                            <div className="w-full absolute rounded-md shadow p-1 bg-white mt-1 lg:hidden">
+                                {
+                                    suggestedProduct.slice(0, 5).map(item => (
+                                        <div key={item.id} className="p-4 hover:bg-gray-100 rounded-md" onClick={() => {
+                                            navigate(`/product/${item.id}`)
+                                        }}>
+                                            {item.productName}
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        )
+                    }
+            </div>
+            <button
+                type="button"
+                className="border px-3 py-1 border-gray-300 cursor-pointer rounded-md hover:bg-gray-100"
+                onClick={() => {setIsSearchOpen(false)
+                    setSearched("")
+                }}
+            >
+                Close
+            </button>
+        </form>
+    )
+}
+
 
         </div>
     )
